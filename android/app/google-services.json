@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "101362972412",
+    "firebase_url": "https://seekihod-tourist-guide-default-rtdb.firebaseio.com",
+    "project_id": "seekihod-tourist-guide",
+    "storage_bucket": "seekihod-tourist-guide.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:101362972412:android:0f065eb15f28d632938979",
+        "android_client_info": {
+          "package_name": "com.example.seekihod"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "101362972412-e3kknhd884979muqu6vg44o7rf7gukar.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJ_H95VTaSgF91Pdk5D6uHWzxtntoola0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "101362972412-e3kknhd884979muqu6vg44o7rf7gukar.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "101362972412-je51nsqb9rs2lp9b7pld3b1n5ghk1dm9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.seekihod"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
