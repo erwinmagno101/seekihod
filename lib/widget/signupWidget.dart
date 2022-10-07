@@ -1,8 +1,11 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
@@ -31,6 +34,26 @@ class _SignUpWidgetState extends State<SignUpWidget> {
   final lastNameController = TextEditingController();
   final userNameController = TextEditingController();
 
+  PlatformFile? pickedFile;
+
+  Future selectFile() async {
+    final result = await FilePicker.platform.pickFiles();
+
+    if (result == null) return;
+
+    setState(() {
+      pickedFile = result.files.first;
+    });
+  }
+
+  Future uploadFile() async {
+    final path = 'User_images/${emailController.text}.jpg';
+    final file = File(pickedFile!.path!);
+
+    final ref = FirebaseStorage.instance.ref().child(path);
+    ref.putFile(file);
+  }
+
   @override
   void dispose() {
     emailController.dispose();
@@ -58,8 +81,36 @@ class _SignUpWidgetState extends State<SignUpWidget> {
               const SizedBox(
                 height: 10,
               ),
-              const CircleAvatar(
-                radius: 75,
+              if (pickedFile != null)
+                CircleAvatar(
+                  radius: 75,
+                  backgroundImage: FileImage(
+                    File(pickedFile!.path!),
+                  ),
+                ),
+              if (pickedFile == null)
+                const CircleAvatar(
+                  radius: 75,
+                ),
+              const SizedBox(
+                height: 5,
+              ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(25),
+                child: Container(
+                  height: 30,
+                  color: myThemes.getIconColor(context),
+                  child: TextButton(
+                    onPressed: selectFile,
+                    child: Text(
+                      'Select an image',
+                      style: TextStyle(
+                        color: myThemes.getPrimaryColor(context),
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                ),
               ),
               const SizedBox(
                 height: 25,
@@ -116,36 +167,38 @@ class _SignUpWidgetState extends State<SignUpWidget> {
               const SizedBox(
                 height: 15,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: TextFormField(
-                  cursorColor: myThemes.getIconColor(context),
-                  style: const TextStyle(fontSize: 20),
-                  controller: firstNameController,
-                  textInputAction: TextInputAction.next,
-                  decoration: textFieldDecoration('First Name'),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) => firstNameController.text.isEmpty
-                      ? 'This Field is required'
-                      : null,
-                ),
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: TextFormField(
-                  cursorColor: myThemes.getIconColor(context),
-                  style: const TextStyle(fontSize: 20),
-                  controller: lastNameController,
-                  textInputAction: TextInputAction.next,
-                  decoration: textFieldDecoration('Last Name'),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) => lastNameController.text.isEmpty
-                      ? 'This Field is required'
-                      : null,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width / 2 - 25,
+                    child: TextFormField(
+                      cursorColor: myThemes.getIconColor(context),
+                      style: const TextStyle(fontSize: 20),
+                      controller: firstNameController,
+                      textInputAction: TextInputAction.next,
+                      decoration: textFieldDecoration('First Name'),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) => firstNameController.text.isEmpty
+                          ? 'This Field is required'
+                          : null,
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width / 2 - 20,
+                    child: TextFormField(
+                      cursorColor: myThemes.getIconColor(context),
+                      style: const TextStyle(fontSize: 20),
+                      controller: lastNameController,
+                      textInputAction: TextInputAction.next,
+                      decoration: textFieldDecoration('Last Name'),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) => lastNameController.text.isEmpty
+                          ? 'This Field is required'
+                          : null,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(
                 height: 15,
@@ -232,6 +285,20 @@ class _SignUpWidgetState extends State<SignUpWidget> {
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
+
+      final email = emailController.text;
+      final firstName = firstNameController.text;
+      final lastName = lastNameController.text;
+      final userName = userNameController.text;
+
+      createUser(
+          email: email,
+          firstName: firstName,
+          lastName: lastName,
+          userName: userName);
+
+      uploadFile();
+
       Utils.showSnackBar('Sign Up Success. User Logged in', true);
 
       navigatorKey.currentState!.popUntil((route) => route.isFirst);
@@ -241,6 +308,23 @@ class _SignUpWidgetState extends State<SignUpWidget> {
       Utils.showSnackBar(e.message, false);
       navigatorKey.currentState!.pop();
     }
+  }
+
+  Future createUser({
+    required String email,
+    required String firstName,
+    required String lastName,
+    required String userName,
+  }) async {
+    final docUser = FirebaseFirestore.instance.collection('User').doc(email);
+
+    final json = {
+      'firstName': firstName,
+      'lastName': lastName,
+      'userName': userName,
+    };
+
+    await docUser.set(json);
   }
 
   InputDecoration textFieldDecoration(String label) {

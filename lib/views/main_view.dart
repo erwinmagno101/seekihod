@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:seekihod/views/events_view.dart';
 import 'package:seekihod/views/feature_view.dart';
 import 'package:seekihod/views/home_view.dart';
 
+import '../models/UserModel.dart';
 import '../widget/change_theme_button_widget.dart';
 
 class MainView extends StatefulWidget {
@@ -19,6 +21,7 @@ class MainView extends StatefulWidget {
 }
 
 final MyThemes myThemes = MyThemes();
+final user = FirebaseAuth.instance.currentUser!;
 
 class _MainViewState extends State<MainView> {
   int index = 2;
@@ -154,7 +157,8 @@ class NavigationDrawer extends StatelessWidget {
             color: myThemes.getIconColorDark(context),
             child: InkWell(
               onTap: () {
-                print('object');
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const AuthPage()));
               },
               child: Container(
                 color: myThemes.getIconColorDark(context),
@@ -171,14 +175,35 @@ class NavigationDrawer extends StatelessWidget {
                     const SizedBox(
                       height: 12,
                     ),
-                    Text(
-                      'Name of the User',
-                      style: TextStyle(
-                          fontSize: 28,
-                          color: myThemes.getFontAllWhite(context)),
+                    FutureBuilder<UserModel?>(
+                      future: readUser(email: user.email.toString()),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          final User = snapshot.data!;
+
+                          return Text(
+                            '${User.firstName} ${User.lastName}',
+                            style: TextStyle(
+                                fontSize: 28,
+                                color: myThemes.getFontAllWhite(context)),
+                          );
+                        } else if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return SizedBox(
+                            height: 30,
+                          );
+                        } else {
+                          return Text(
+                            'No Data Recieved',
+                            style: TextStyle(
+                                fontSize: 28,
+                                color: myThemes.getFontAllWhite(context)),
+                          );
+                        }
+                      },
                     ),
                     Text(
-                      'user.email.com',
+                      user.email.toString(),
                       style: TextStyle(
                           fontSize: 16,
                           color: myThemes.getFontAllWhite(context)),
@@ -298,4 +323,15 @@ class NavigationDrawer extends StatelessWidget {
           ],
         ),
       );
+
+  Future<UserModel?> readUser({required String email}) async {
+    final docUser = FirebaseFirestore.instance.collection('User').doc(email);
+
+    final snapshot = await docUser.get();
+
+    if (snapshot.exists) {
+      return UserModel.fromJson(snapshot.data()!);
+    }
+    return null;
+  }
 }
