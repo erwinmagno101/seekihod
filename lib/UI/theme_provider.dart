@@ -15,6 +15,9 @@ class ThemeProvider extends ChangeNotifier {
 }
 
 class MyThemes {
+  static final stylePrimaryColor = HexColor('#43B3AE');
+  static final styleSecondaryColor = HexColor('#F73859');
+
   static final darkPrimary = HexColor('#222831');
   static final darkSecondary = HexColor('#393E46');
 
@@ -184,12 +187,30 @@ class MyThemes {
     }
   }
 
+  Color getFontNormal(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    if (themeProvider.isDarkMode) {
+      return Colors.white;
+    } else {
+      return Colors.black;
+    }
+  }
+
   Color getIconColor(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     if (themeProvider.isDarkMode) {
       return Colors.white;
     } else {
-      return HexColor('#F73859');
+      return stylePrimaryColor;
+    }
+  }
+
+  Color getIconColorSecondary(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    if (themeProvider.isDarkMode) {
+      return Colors.white;
+    } else {
+      return styleSecondaryColor;
     }
   }
 
@@ -207,7 +228,7 @@ class MyThemes {
     if (themeProvider.isDarkMode) {
       return darkPrimary;
     } else {
-      return HexColor('#F73859');
+      return stylePrimaryColor;
     }
   }
 }

@@ -49,37 +49,37 @@ class _DirectoryViewState extends State<DirectoryView> {
             ),
           ),
         ),
-        Container(
-          height: 70,
-          margin: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
           child: TextField(
-            cursorColor: myThemes.getStylePrimaryColor(context),
-            style: const TextStyle(fontSize: 17),
-            decoration: InputDecoration(
-              fillColor: myThemes.getSecondaryColor(context),
-              filled: true,
-              helperStyle: TextStyle(color: myThemes.getDarkLight(context)),
-              helperText: 'Find the spot your looking for!',
-              hintStyle: const TextStyle(
-                fontSize: 15,
-              ),
-              prefixIcon: Icon(
-                EvaIcons.search,
-                color: myThemes.getDarkLight(context).withOpacity(.7),
-              ),
-              hintText: 'Search Tourist Spot',
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-                borderSide:
-                    const BorderSide(width: 1, color: Colors.transparent),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-                borderSide:
-                    BorderSide(width: 1, color: myThemes.getDarkLight(context)),
-              ),
-            ),
+            enableSuggestions: false,
+            keyboardType: TextInputType.name,
+            autocorrect: false,
+            cursorColor: myThemes.getIconColor(context),
+            style: const TextStyle(fontSize: 20),
             onChanged: searchSpot,
+            decoration: InputDecoration(
+              helperText: 'Find The Spot your looking for!',
+              helperStyle:
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+              filled: true,
+              fillColor: myThemes.getSecondaryColor(context),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              isDense: true,
+              focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide(
+                      width: 1, color: myThemes.getIconColor(context))),
+              enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(20)),
+              labelText: 'Search a Tourist Spot',
+              labelStyle: TextStyle(
+                  fontSize: 20, color: myThemes.getIconColor(context)),
+              floatingLabelStyle: TextStyle(
+                  color: myThemes.getIconColor(context), fontSize: 20),
+            ),
           ),
         ),
         Expanded(

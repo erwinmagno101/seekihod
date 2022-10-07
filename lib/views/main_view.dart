@@ -1,6 +1,9 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:seekihod/UI/theme_provider.dart';
+import 'package:seekihod/models/GlobalVar.dart';
+import 'package:seekihod/pages/Auth_page.dart';
 import 'package:seekihod/views/archive_view.dart';
 import 'package:seekihod/views/events_view.dart';
 import 'package:seekihod/views/feature_view.dart';
@@ -43,13 +46,28 @@ class _MainViewState extends State<MainView> {
           InkWell(
             overlayColor: MaterialStateProperty.all(const Color(0x00000000)),
             onTap: () {
-              print("object");
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const AuthPage()));
             },
-            child: Container(
-              padding: const EdgeInsets.only(right: 10),
-              child: const CircleAvatar(
-                radius: 15,
-              ),
+            child: StreamBuilder<User?>(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Container(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: const CircleAvatar(
+                      radius: 15,
+                    ),
+                  );
+                } else {
+                  return Container(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: const CircleAvatar(
+                      radius: 15,
+                    ),
+                  );
+                }
+              },
             ),
           )
         ],
@@ -127,42 +145,92 @@ class NavigationDrawer extends StatelessWidget {
         ),
       );
 
-  Widget buildHeader(BuildContext context) => Material(
-        color: myThemes.getIconColorDark(context),
-        child: InkWell(
-          onTap: () {
-            print('object');
-          },
-          child: Container(
+  Widget buildHeader(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return Material(
             color: myThemes.getIconColorDark(context),
-            padding: EdgeInsets.only(
-                top: MediaQuery.of(context).padding.top, bottom: 30),
-            child: Column(
-              children: [
-                const SizedBox(
-                  height: 10,
+            child: InkWell(
+              onTap: () {
+                print('object');
+              },
+              child: Container(
+                color: myThemes.getIconColorDark(context),
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).padding.top, bottom: 30),
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    const CircleAvatar(
+                      radius: 52,
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    Text(
+                      'Name of the User',
+                      style: TextStyle(
+                          fontSize: 28,
+                          color: myThemes.getFontAllWhite(context)),
+                    ),
+                    Text(
+                      'user.email.com',
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: myThemes.getFontAllWhite(context)),
+                    ),
+                  ],
                 ),
-                const CircleAvatar(
-                  radius: 52,
-                ),
-                const SizedBox(
-                  height: 12,
-                ),
-                Text(
-                  'Name of the User',
-                  style: TextStyle(
-                      fontSize: 28, color: myThemes.getFontAllWhite(context)),
-                ),
-                Text(
-                  'user.email.com',
-                  style: TextStyle(
-                      fontSize: 16, color: myThemes.getFontAllWhite(context)),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-      );
+          );
+        } else {
+          return Material(
+            color: myThemes.getPrimaryColor(context),
+            child: Container(
+              color: myThemes.getPrimaryColor(context),
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).padding.top, bottom: 5),
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 80),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(25),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        color: myThemes.getIconColor(context),
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => const AuthPage()));
+                          },
+                          child: Text(
+                            'Sign In',
+                            style: TextStyle(
+                                color: myThemes.getPrimaryColor(context),
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
 
   Widget buildMenuItems(BuildContext context) => Container(
         padding: const EdgeInsets.all(10),
