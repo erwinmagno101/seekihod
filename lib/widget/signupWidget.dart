@@ -55,7 +55,10 @@ class _SignUpWidgetState extends State<SignUpWidget> {
     final file = File(pickedFile!.path!);
 
     final ref = FirebaseStorage.instance.ref().child(path);
-    ref.putFile(file);
+    uploadTask = ref.putFile(file);
+    final snapshot = await uploadTask!.whenComplete(() {});
+    final urlDownload = await snapshot.ref.getDownloadURL();
+    print('Download link $urlDownload');
   }
 
   @override

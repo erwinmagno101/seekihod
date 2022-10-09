@@ -35,7 +35,8 @@ class _DummyPageState extends State<DummyPage> {
         ),
       ),
       body: FutureBuilder<UserModel?>(
-        future: readUser(email: user.email.toString()),
+        future: readUser(
+            email: FirebaseAuth.instance.currentUser!.email.toString()),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final User = snapshot.data!;
@@ -45,11 +46,6 @@ class _DummyPageState extends State<DummyPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircleAvatar(
-                    radius: 80,
-                    backgroundImage: NetworkImage(
-                        'gs://seekihod-tourist-guide.appspot.com/User_images/test5@gmail.com.jpg'),
-                  ),
                   Text(
                     user.email!,
                     style: const TextStyle(
