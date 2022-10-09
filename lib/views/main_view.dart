@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:seekihod/UI/theme_provider.dart';
 import 'package:seekihod/models/GlobalVar.dart';
@@ -23,6 +24,9 @@ class MainView extends StatefulWidget {
 final MyThemes myThemes = MyThemes();
 final user = FirebaseAuth.instance.currentUser!;
 
+var img;
+var userName;
+
 class _MainViewState extends State<MainView> {
   int index = 2;
 
@@ -40,37 +44,114 @@ class _MainViewState extends State<MainView> {
     const Text('Archive'),
   ];
 
+  getImage() async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+
+    try {
+      Reference ref = storage
+          .ref()
+          .child('User_images/${FirebaseAuth.instance.currentUser!.email}.jpg');
+      String imageUrl = await ref.getDownloadURL();
+      img = imageUrl;
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  readUser() async {
+    try {
+      final docUser = FirebaseFirestore.instance
+          .collection('User')
+          .doc(FirebaseAuth.instance.currentUser!.email.toString());
+
+      final snapshot = await docUser.get();
+
+      if (snapshot.exists) {
+        userName = snapshot.data()!;
+      }
+      return null;
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Widget avatar(double rad) {
+    try {
+      return CircleAvatar(
+        radius: rad,
+        backgroundImage: NetworkImage(img),
+      );
+    } catch (e) {
+      print(e);
+      return CircleAvatar(
+        radius: rad,
+        backgroundImage: const AssetImage('lib/assets/images/emptyProfile.jpg'),
+      );
+    }
+  }
+
+  Widget avatarName() {
+    try {
+      return Text(
+        '${userName["firstName"]} ${userName["lastName"]}',
+        style:
+            TextStyle(fontSize: 28, color: myThemes.getFontAllWhite(context)),
+      );
+    } catch (e) {
+      return Text(
+        '',
+        style:
+            TextStyle(fontSize: 28, color: myThemes.getFontAllWhite(context)),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    readUser();
+    getImage();
     return Scaffold(
-      drawer: const NavigationDrawer(),
+      drawer: NavigationDrawer(
+        avatar: avatar(80),
+        avatarName: avatarName(),
+      ),
       appBar: AppBar(
         actions: [
-          InkWell(
-            overlayColor: MaterialStateProperty.all(const Color(0x00000000)),
-            onTap: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const AuthPage()));
-            },
-            child: StreamBuilder<User?>(
-              stream: FirebaseAuth.instance.authStateChanges(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Container(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: const CircleAvatar(
-                      radius: 15,
-                    ),
-                  );
-                } else {
-                  return Container(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: const CircleAvatar(
-                      radius: 15,
-                    ),
-                  );
-                }
+          Padding(
+            padding: const EdgeInsets.only(right: 15),
+            child: InkWell(
+              overlayColor: MaterialStateProperty.all(const Color(0x00000000)),
+              onTap: () {
+                setState(() {
+                  readUser();
+                  getImage();
+                });
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const AuthPage()));
               },
+              child: StreamBuilder<User?>(
+                stream: FirebaseAuth.instance.authStateChanges(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    getImage();
+                    readUser();
+
+                    return avatar(15);
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const CircleAvatar(
+                      radius: 15,
+                      child: CircularProgressIndicator(),
+                    );
+                  } else {
+                    return const CircleAvatar(
+                      radius: 15,
+                      backgroundImage:
+                          AssetImage('lib/assets/images/emptyProfile.jpg'),
+                    );
+                  }
+                },
+              ),
             ),
           )
         ],
@@ -132,21 +213,33 @@ class _MainViewState extends State<MainView> {
   }
 }
 
-class NavigationDrawer extends StatelessWidget {
-  const NavigationDrawer({Key? key}) : super(key: key);
+class NavigationDrawer extends StatefulWidget {
+  final Widget avatar;
+  final Widget avatarName;
+
+  const NavigationDrawer(
+      {Key? key, required this.avatar, required this.avatarName})
+      : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Drawer(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              buildHeader(context),
-              buildMenuItems(context),
-            ],
-          ),
+  State<NavigationDrawer> createState() => _NavigationDrawerState();
+}
+
+class _NavigationDrawerState extends State<NavigationDrawer> {
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            buildHeader(context),
+            buildMenuItems(context),
+          ],
         ),
-      );
+      ),
+    );
+  }
 
   Widget buildHeader(BuildContext context) {
     return StreamBuilder<User?>(
@@ -169,41 +262,13 @@ class NavigationDrawer extends StatelessWidget {
                     const SizedBox(
                       height: 25,
                     ),
-                    const CircleAvatar(
-                      radius: 52,
-                    ),
+                    widget.avatar,
                     const SizedBox(
                       height: 12,
                     ),
-                    FutureBuilder<UserModel?>(
-                      future: readUser(email: user.email.toString()),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          final User = snapshot.data!;
-
-                          return Text(
-                            '${User.firstName} ${User.lastName}',
-                            style: TextStyle(
-                                fontSize: 28,
-                                color: myThemes.getFontAllWhite(context)),
-                          );
-                        } else if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return SizedBox(
-                            height: 30,
-                          );
-                        } else {
-                          return Text(
-                            'No Data Recieved',
-                            style: TextStyle(
-                                fontSize: 28,
-                                color: myThemes.getFontAllWhite(context)),
-                          );
-                        }
-                      },
-                    ),
+                    widget.avatarName,
                     Text(
-                      user.email.toString(),
+                      FirebaseAuth.instance.currentUser!.email.toString(),
                       style: TextStyle(
                           fontSize: 16,
                           color: myThemes.getFontAllWhite(context)),
@@ -324,8 +389,10 @@ class NavigationDrawer extends StatelessWidget {
         ),
       );
 
-  Future<UserModel?> readUser({required String email}) async {
-    final docUser = FirebaseFirestore.instance.collection('User').doc(email);
+  Future<UserModel?> readUser() async {
+    final docUser = FirebaseFirestore.instance
+        .collection('User')
+        .doc(FirebaseAuth.instance.currentUser!.email.toString());
 
     final snapshot = await docUser.get();
 

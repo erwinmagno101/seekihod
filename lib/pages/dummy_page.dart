@@ -4,10 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:seekihod/models/GlobalVar.dart';
 import 'package:seekihod/models/UserModel.dart';
+import 'package:seekihod/views/main_view.dart';
 
 class DummyPage extends StatefulWidget {
-  const DummyPage({Key? key}) : super(key: key);
+  DummyPage({Key? key}) : super(key: key);
 
   @override
   State<DummyPage> createState() => _DummyPageState();
@@ -20,6 +22,17 @@ class _DummyPageState extends State<DummyPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
+        leading: BackButton(
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      MainView()), // this mymainpage is your page to refresh
+              (Route<dynamic> route) => false,
+            );
+          },
+        ),
       ),
       body: FutureBuilder<UserModel?>(
         future: readUser(email: user.email.toString()),
@@ -32,6 +45,11 @@ class _DummyPageState extends State<DummyPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  CircleAvatar(
+                    radius: 80,
+                    backgroundImage: NetworkImage(
+                        'gs://seekihod-tourist-guide.appspot.com/User_images/test5@gmail.com.jpg'),
+                  ),
                   Text(
                     user.email!,
                     style: const TextStyle(
@@ -67,7 +85,15 @@ class _DummyPageState extends State<DummyPage> {
             return Column(
               children: [
                 ElevatedButton.icon(
-                    onPressed: () => FirebaseAuth.instance.signOut(),
+                    onPressed: () {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const MainView()),
+                        (Route<dynamic> route) => false,
+                      );
+                      FirebaseAuth.instance.signOut();
+                    },
                     icon: const Icon(EvaIcons.skipBack),
                     label: const Text('Log out'))
               ],

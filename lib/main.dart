@@ -48,7 +48,7 @@ class HomePage extends StatelessWidget {
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
-              return const MainView();
+              return MainView();
             default:
               return const Text('Loading');
           }

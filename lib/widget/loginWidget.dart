@@ -9,12 +9,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:seekihod/UI/theme_provider.dart';
+import 'package:seekihod/models/GlobalVar.dart';
+import 'package:seekihod/views/main_view.dart';
 
 import '../main.dart';
 import '../models/Utils.dart';
 
 class LoginWidget extends StatefulWidget {
   final VoidCallback onClickedSignUp;
+
   const LoginWidget({Key? key, required this.onClickedSignUp})
       : super(key: key);
 
@@ -42,6 +45,15 @@ class _LoginWidgetState extends State<LoginWidget> {
         elevation: 0,
         leading: BackButton(
           color: myThemes.getIconColor(context),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      const MainView()), // this mymainpage is your page to refresh
+              (Route<dynamic> route) => false,
+            );
+          },
         ),
       ),
       body: SingleChildScrollView(
@@ -234,6 +246,7 @@ class _LoginWidgetState extends State<LoginWidget> {
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
+
       Utils.showSnackBar('Log in Success. Welcome!', true);
 
       navigatorKey.currentState!.popUntil((route) => route.isCurrent);

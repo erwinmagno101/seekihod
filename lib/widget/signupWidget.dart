@@ -10,6 +10,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:seekihod/models/GlobalVar.dart';
+import 'package:seekihod/views/main_view.dart';
 
 import '../UI/theme_provider.dart';
 import '../main.dart';
@@ -33,8 +35,10 @@ class _SignUpWidgetState extends State<SignUpWidget> {
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final userNameController = TextEditingController();
+  String urlDownload = "";
 
   PlatformFile? pickedFile;
+  UploadTask? uploadTask;
 
   Future selectFile() async {
     final result = await FilePicker.platform.pickFiles();
@@ -63,6 +67,9 @@ class _SignUpWidgetState extends State<SignUpWidget> {
 
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      MainView();
+    });
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -91,6 +98,8 @@ class _SignUpWidgetState extends State<SignUpWidget> {
               if (pickedFile == null)
                 const CircleAvatar(
                   radius: 75,
+                  backgroundImage:
+                      AssetImage('lib/assets/images/emptyProfile.jpg'),
                 ),
               const SizedBox(
                 height: 5,
@@ -292,20 +301,24 @@ class _SignUpWidgetState extends State<SignUpWidget> {
       final userName = userNameController.text;
 
       createUser(
-          email: email,
-          firstName: firstName,
-          lastName: lastName,
-          userName: userName);
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        userName: userName,
+      );
 
       uploadFile();
 
-      Utils.showSnackBar('Sign Up Success. User Logged in', true);
+      globalVar.getImage();
 
-      navigatorKey.currentState!.popUntil((route) => route.isFirst);
+      Utils.showSnackBar('Sign Up Success. User Logged in', true);
+      navigatorKey.currentState!.pop();
+      navigatorKey.currentState!.popUntil((route) => route.isCurrent);
     } on FirebaseAuthException catch (e) {
       print(e);
 
       Utils.showSnackBar(e.message, false);
+
       navigatorKey.currentState!.pop();
     }
   }
