@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -17,9 +19,11 @@ class _HomewViewState extends State<HomewView> {
   final MyThemes myThemes = MyThemes();
   List<SpotModel> results = [];
   List<SpotModel> touristSpot = [];
-  List<SpotModel> accomodation = [];
+  List<SpotModel> accommodation = [];
   List<SpotModel> food = [];
   List<SpotModel> activities = [];
+
+  var rand = Random().nextInt(3) + 2;
 
   @override
   Widget build(BuildContext context) {
@@ -69,8 +73,8 @@ class _HomewViewState extends State<HomewView> {
             const SizedBox(
               height: 15,
             ),
-            categoryHeader('Accomodation', 'accomodation'),
-            getListType(accomodation, 'Accomodation'),
+            categoryHeader('Accommodation', 'accommodation'),
+            getListType(accommodation, 'Accommodation'),
             const SizedBox(
               height: 15,
             ),
@@ -127,10 +131,10 @@ class _HomewViewState extends State<HomewView> {
                             return buildImage(images, index);
                           },
                           options: CarouselOptions(
-                            enlargeCenterPage: false,
-                            viewportFraction: 1,
-                            autoPlay: true,
-                          ),
+                              enlargeCenterPage: false,
+                              viewportFraction: 1,
+                              autoPlay: true,
+                              autoPlayInterval: const Duration(seconds: 4)),
                         ),
                       ),
                     ),
@@ -299,8 +303,8 @@ class _HomewViewState extends State<HomewView> {
             if (type == 'Tourist Spot') {
               listType = getModels(results, 'spot');
             }
-            if (type == 'Accomodation') {
-              listType = getModels(results, 'accomodation');
+            if (type == 'Accommodation') {
+              listType = getModels(results, 'accommodation');
             }
             if (type == 'Food') {
               listType = getModels(results, 'food');
@@ -340,7 +344,7 @@ class _HomewViewState extends State<HomewView> {
       return myThemes.spotColor;
     } else if (currentModel == 'food') {
       return myThemes.foodColor;
-    } else if (currentModel == 'accomodation') {
+    } else if (currentModel == 'accommodation') {
       return myThemes.accomodationColor;
     } else if (currentModel == 'activity') {
       return myThemes.activityColor;
@@ -355,7 +359,7 @@ class _HomewViewState extends State<HomewView> {
         return 'lib/assets/icons/icons8-beach-48.png';
       case 'food':
         return 'lib/assets/icons/icons8-food-and-wine-48.png';
-      case 'accomodation':
+      case 'accommodation':
         return 'lib/assets/icons/icons8-condo-48.png';
       case 'activity':
         return 'lib/assets/icons/icons8-wakeboarding-48.png';

@@ -256,7 +256,7 @@ class _DirectoryViewState extends State<DirectoryView> {
       return myThemes.spotColor;
     } else if (currentModel.type == 'food') {
       return myThemes.foodColor;
-    } else if (currentModel.type == 'accomodation') {
+    } else if (currentModel.type == 'accommodation') {
       return myThemes.accomodationColor;
     } else if (currentModel.type == 'activity') {
       return myThemes.activityColor;
@@ -271,7 +271,7 @@ class _DirectoryViewState extends State<DirectoryView> {
         return 'lib/assets/icons/icons8-beach-48.png';
       case 'food':
         return 'lib/assets/icons/icons8-food-and-wine-48.png';
-      case 'accomodation':
+      case 'accommodation':
         return 'lib/assets/icons/icons8-condo-48.png';
       case 'activity':
         return 'lib/assets/icons/icons8-wakeboarding-48.png';

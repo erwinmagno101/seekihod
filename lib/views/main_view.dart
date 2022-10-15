@@ -331,12 +331,12 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
               title: Text('Settings'),
             ),
             const ListTile(
-              leading: Icon(EvaIcons.moonOutline),
+              leading: Icon(EvaIcons.moon),
               title: Text('Dark mode'),
               trailing: ChangeThemeButtonWidget(),
             ),
             const ListTile(
-              leading: Icon(EvaIcons.moonOutline),
+              leading: Icon(EvaIcons.logOut),
               title: Text('Sign out'),
             ),
             Divider(
@@ -347,19 +347,19 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
               title: Text('DOT Siquijor'),
             ),
             const ListTile(
-              leading: Icon(EvaIcons.moonOutline),
+              leading: Icon(EvaIcons.heart),
               title: Text('Health Protocols'),
             ),
             const ListTile(
-              leading: Icon(EvaIcons.moonOutline),
+              leading: Icon(EvaIcons.questionMarkCircle),
               title: Text('FAQs'),
             ),
             const ListTile(
-              leading: Icon(EvaIcons.moonOutline),
+              leading: Icon(EvaIcons.phoneCall),
               title: Text('Hotline'),
             ),
             const ListTile(
-              leading: Icon(EvaIcons.moonOutline),
+              leading: Icon(EvaIcons.facebook),
               title: Text('Facebook'),
             ),
             Divider(
@@ -370,19 +370,19 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
               title: Text('About Us'),
             ),
             const ListTile(
-              leading: Icon(EvaIcons.moonOutline),
+              leading: Icon(EvaIcons.phone),
               title: Text('Contact Us'),
             ),
             const ListTile(
-              leading: Icon(EvaIcons.moonOutline),
+              leading: Icon(EvaIcons.facebook),
               title: Text('Facebook'),
             ),
             const ListTile(
-              leading: Icon(EvaIcons.moonOutline),
+              leading: Icon(EvaIcons.syncOutline),
               title: Text('Instagram'),
             ),
             const ListTile(
-              leading: Icon(EvaIcons.moonOutline),
+              leading: Icon(EvaIcons.code),
               title: Text('Developers'),
             ),
           ],
