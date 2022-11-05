@@ -128,8 +128,13 @@ class _DirectoryViewState extends State<DirectoryView> {
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 1),
       child: InkWell(
         onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => SpotPage(spotModel: currentModel)));
+          showModalBottomSheet(
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              context: context,
+              builder: (context) => SpotPage(
+                    spotModel: currentModel,
+                  ));
         },
         child: Card(
           color: Colors.transparent,

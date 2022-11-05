@@ -98,8 +98,13 @@ class _HomewViewState extends State<HomewView> {
         width: 275,
         child: InkWell(
           onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => SpotPage(spotModel: currentModel)));
+            showModalBottomSheet(
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                context: context,
+                builder: (context) => SpotPage(
+                      spotModel: currentModel,
+                    ));
           },
           child: Card(
             color: Colors.transparent,
