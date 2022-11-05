@@ -1,7 +1,9 @@
 import 'package:bordered_text/bordered_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:seekihod/models/EventModel.dart';
 import 'package:seekihod/models/NewsModel.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../models/SpotModel.dart';
 import 'main_view.dart';
@@ -14,6 +16,8 @@ class EventsView extends StatefulWidget {
 }
 
 class _EventsViewState extends State<EventsView> {
+  List<EventModel> eventsList = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,16 +48,36 @@ class _EventsViewState extends State<EventsView> {
               ),
               Container(
                 height: 250,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 10,
-                  itemBuilder: ((context, index) {
-                    return Container(
-                      child: Card(),
-                      width: MediaQuery.of(context).size.width / 1.2,
-                    );
-                  }),
-                ),
+                child: StreamBuilder<List<EventModel>>(
+                    stream: readEvents(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Text(snapshot.error.toString());
+                      } else if (snapshot.hasData) {
+                        eventsList = snapshot.data!;
+
+                        return ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: eventsList.length,
+                            itemBuilder: (context, index) {
+                              EventModel currentEventModel = eventsList[index];
+                              return Card(
+                                child: Container(
+                                  width:
+                                      MediaQuery.of(context).size.width / 1.2,
+                                  child: Center(
+                                    child: Text(
+                                      currentEventModel.title,
+                                      style: const TextStyle(fontSize: 20),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            });
+                      } else {
+                        return Text("No Data");
+                      }
+                    }),
               ),
               const SizedBox(
                 height: 15,
@@ -70,10 +94,15 @@ class _EventsViewState extends State<EventsView> {
                 height: 5,
               ),
               Container(
-                height: 200,
-                child: Container(
-                  child: Card(),
-                  width: MediaQuery.of(context).size.width,
+                height: 300,
+                child: Card(
+                  child: Container(
+                    padding: EdgeInsets.all(15),
+                    width: MediaQuery.of(context).size.width,
+                    child: SfCalendar(
+                      view: CalendarView.month,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(
@@ -114,4 +143,10 @@ class _EventsViewState extends State<EventsView> {
       .snapshots()
       .map((snapshot) =>
           snapshot.docs.map((doc) => SpotModel.fromJson(doc.data())).toList());
+
+  Stream<List<EventModel>> readEvents() => FirebaseFirestore.instance
+      .collection('Event')
+      .snapshots()
+      .map((snapshot) =>
+          snapshot.docs.map((doc) => EventModel.fromJson(doc.data())).toList());
 }

@@ -231,4 +231,13 @@ class MyThemes {
       return stylePrimaryColor;
     }
   }
+
+  Color getIconColorDarkSecondary(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    if (themeProvider.isDarkMode) {
+      return darkSecondary;
+    } else {
+      return stylePrimaryColor;
+    }
+  }
 }

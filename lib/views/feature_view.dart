@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:seekihod/UI/theme_provider.dart';
 
 import '../models/NewsModel.dart';
+import '../models/SpotModel.dart';
 
 class FeatureView extends StatefulWidget {
   const FeatureView({Key? key}) : super(key: key);
@@ -13,10 +14,10 @@ class FeatureView extends StatefulWidget {
 }
 
 class _FeatureViewState extends State<FeatureView> {
-  List<ContentModel> result = [];
-  List<ContentModel> news = [];
-  List<ContentModel> articles = [];
-  List<String> sample = ['s', 'a', 'd'];
+  List<NewsModel> result = [];
+  List<NewsModel> newsList = [];
+  List<NewsModel> articlesList = [];
+  List<SpotModel> spotList = [];
 
   MyThemes myThemes = MyThemes();
 
@@ -97,19 +98,7 @@ class _FeatureViewState extends State<FeatureView> {
               const SizedBox(
                 height: 5,
               ),
-              Container(
-                height: 160,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 10,
-                  itemBuilder: ((context, index) {
-                    return Container(
-                      child: Card(),
-                      width: MediaQuery.of(context).size.width / 1.5,
-                    );
-                  }),
-                ),
-              ),
+              getContentType(newsList, 'News'),
               const SizedBox(
                 height: 15,
               ),
@@ -124,18 +113,7 @@ class _FeatureViewState extends State<FeatureView> {
               const SizedBox(
                 height: 5,
               ),
-              Container(
-                height: MediaQuery.of(context).size.width / .7,
-                child: ListView.builder(
-                  itemCount: 5,
-                  itemBuilder: ((context, index) {
-                    return Container(
-                      height: 300,
-                      child: Card(),
-                    );
-                  }),
-                ),
-              ),
+              getContentType(articlesList, 'Article'),
             ],
           ),
         ),
@@ -143,18 +121,17 @@ class _FeatureViewState extends State<FeatureView> {
     );
   }
 
-  Stream<List<ContentModel>> readContent() => FirebaseFirestore.instance
+  Stream<List<NewsModel>> readContent() => FirebaseFirestore.instance
       .collection('Content')
       .snapshots()
-      .map((snapshot) => snapshot.docs
-          .map((doc) => ContentModel.fromJson(doc.data()))
-          .toList());
+      .map((snapshot) =>
+          snapshot.docs.map((doc) => NewsModel.fromJson(doc.data())).toList());
 
-  Widget getContentType(List<ContentModel> contentType, String type) {
+  Widget getContentType(List<NewsModel> contentType, String type) {
     return Container(
       height: 200,
       padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: StreamBuilder<List<ContentModel>>(
+      child: StreamBuilder<List<NewsModel>>(
         stream: readContent(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
@@ -170,10 +147,12 @@ class _FeatureViewState extends State<FeatureView> {
               scrollDirection: Axis.horizontal,
               itemCount: contentType.length,
               itemBuilder: ((context, index) {
-                ContentModel currentModel = contentType[index];
-                return Container(
-                  width: MediaQuery.of(context).size.width - 30,
-                  child: Card(),
+                NewsModel currentFeatureModel = contentType[index];
+                return Card(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width - 30,
+                    child: Text(currentFeatureModel.title),
+                  ),
                 );
               }),
             );
@@ -187,10 +166,10 @@ class _FeatureViewState extends State<FeatureView> {
     );
   }
 
-  List<ContentModel> getModels(List<ContentModel> allSpot, String type) {
-    List<ContentModel> thisModel = [];
+  List<NewsModel> getModels(List<NewsModel> allSpot, String type) {
+    List<NewsModel> thisModel = [];
     for (int index = 1; index <= allSpot.length; index++) {
-      ContentModel currentModel = allSpot[index - 1];
+      NewsModel currentModel = allSpot[index - 1];
       if (currentModel.type == type) {
         thisModel.add(currentModel);
       }
@@ -233,4 +212,10 @@ class _FeatureViewState extends State<FeatureView> {
       ),
     );
   }
+
+  Stream<List<SpotModel>> readSpots() => FirebaseFirestore.instance
+      .collection('Spots')
+      .snapshots()
+      .map((snapshot) =>
+          snapshot.docs.map((doc) => SpotModel.fromJson(doc.data())).toList());
 }

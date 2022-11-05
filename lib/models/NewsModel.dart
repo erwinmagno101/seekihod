@@ -1,12 +1,12 @@
 // ignore: file_names
-class ContentModel {
+class NewsModel {
   String title;
   String description;
   String imgUrl;
   String link;
   String type;
 
-  ContentModel({
+  NewsModel({
     required this.title,
     required this.description,
     required this.imgUrl,
@@ -22,7 +22,7 @@ class ContentModel {
         'type': type,
       };
 
-  static ContentModel fromJson(Map<String, dynamic> json) => ContentModel(
+  static NewsModel fromJson(Map<String, dynamic> json) => NewsModel(
         title: json['title'],
         description: json['description'],
         imgUrl: json['imgUrl'],

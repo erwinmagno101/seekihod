@@ -7,6 +7,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
 import 'package:seekihod/models/SpotModel.dart';
+import 'package:seekihod/pages/navigation_page.dart';
 import 'package:seekihod/views/main_view.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -34,287 +35,286 @@ class _SpotPageState extends State<SpotPage> {
         initialChildSize: .7,
         maxChildSize: .9,
         minChildSize: .5,
-        builder: (_, controller) => Container(
-          decoration: BoxDecoration(
-            color: myThemes.getPrimaryColor(context),
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(20),
+        builder: (_, controller) => Scaffold(
+          backgroundColor: Colors.transparent,
+          floatingActionButton: buildNavigateButton(context),
+          body: Container(
+            decoration: BoxDecoration(
+              color: myThemes.getPrimaryColor(context),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
             ),
-          ),
-          child: SingleChildScrollView(
-            controller: controller,
-            child: Column(
-              children: <Widget>[
-                const Icon(
-                  Icons.drag_handle,
-                  size: 30,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: myThemes.getPrimaryColor(context),
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(.2),
-                        spreadRadius: .1,
-                        blurRadius: .1,
-                      )
-                    ],
+            child: SingleChildScrollView(
+              controller: controller,
+              child: Column(
+                children: <Widget>[
+                  const Icon(
+                    Icons.drag_handle,
+                    size: 30,
                   ),
-                  height: 250,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Image.network(
-                        widget.spotModel.imgUrl,
-                        fit: BoxFit.cover,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              Colors.black.withOpacity(1),
-                            ],
-                          ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: myThemes.getPrimaryColor(context),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(.2),
+                          spreadRadius: .1,
+                          blurRadius: .1,
+                        )
+                      ],
+                    ),
+                    height: 250,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.network(
+                          widget.spotModel.imgUrl,
+                          fit: BoxFit.cover,
                         ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 15),
-                        child: Align(
-                          alignment: AlignmentDirectional.bottomStart,
-                          child: Container(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 3,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        widget.spotModel.name,
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            color: myThemes
-                                                .getFontAllWhite(context),
-                                            fontSize: 25,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.pin_drop,
-                                            size: 15,
-                                          ),
-                                          Text(
-                                            widget.spotModel.address,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                      Text(
-                                        widget.spotModel.type.toUpperCase(),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Spacer(
-                                  flex: 1,
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          const Text(
-                                            '4.8',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          Icon(
-                                            EvaIcons.star,
-                                            size: 15,
-                                            color:
-                                                myThemes.getIconColor(context),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      const Text(
-                                        '1k Reviews',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.transparent,
+                                Colors.black.withOpacity(1),
                               ],
                             ),
                           ),
                         ),
-                      )
-                    ],
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 15),
+                          child: Align(
+                            alignment: AlignmentDirectional.bottomStart,
+                            child: Container(
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          widget.spotModel.name,
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                              color: myThemes
+                                                  .getFontAllWhite(context),
+                                              fontSize: 25,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.pin_drop,
+                                              size: 15,
+                                              color: myThemes
+                                                  .getIconColor(context),
+                                            ),
+                                            Text(
+                                              widget.spotModel.address,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                color: myThemes
+                                                    .getFontAllWhite(context),
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Text(
+                                          widget.spotModel.type.toUpperCase(),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: myThemes
+                                                .getFontAllWhite(context),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Spacer(
+                                    flex: 1,
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              '4.8',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: myThemes
+                                                    .getFontAllWhite(context),
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              width: 5,
+                                            ),
+                                            Icon(
+                                              EvaIcons.star,
+                                              size: 15,
+                                              color: myThemes
+                                                  .getIconColor(context),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text(
+                                          '1k Reviews',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: myThemes
+                                                .getFontAllWhite(context),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'About this Tourist Spot',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          EvaIcons.arrowCircleRightOutline,
-                          size: 25,
-                        ),
-                      )
-                    ],
+                  const SizedBox(
+                    height: 10,
                   ),
-                ),
-                const SizedBox(
-                  width: 15,
-                ),
-                Center(
-                  child: Container(
+                  Container(
                     padding: const EdgeInsets.symmetric(horizontal: 25),
-                    child: Text(
-                      widget.spotModel.descriptionHeader,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                      style: TextStyle(
-                        color: myThemes.getFontwithOpacity(context, .6),
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                SizedBox(
-                  height: 175,
-                  width: MediaQuery.of(context).size.width,
-                  child: CarouselSlider.builder(
-                    itemCount: widget.spotModel.images.length,
-                    itemBuilder: (context, index, realIndex) {
-                      final images = widget.spotModel.images[index];
-                      return buildImage(images, index);
-                    },
-                    options: CarouselOptions(
-                      viewportFraction: 0.9,
-                      enableInfiniteScroll: true,
-                      autoPlay: true,
-                      autoPlayInterval: const Duration(seconds: 5),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(25),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      color: myThemes.getIconColor(context),
-                      child: TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Navigate',
-                          style: TextStyle(
-                              color: myThemes.getPrimaryColor(context),
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'About this Tourist Spot',
+                          style: TextStyle(fontSize: 20),
                         ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Rate this Attraction',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      const Text(
-                        'Tell others what you think',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Center(
-                        child: RatingBar.builder(
-                          itemSize: 35,
-                          itemPadding:
-                              const EdgeInsets.symmetric(horizontal: 10),
-                          minRating: 1,
-                          itemBuilder: (context, _) => Icon(
-                            EvaIcons.star,
-                            color: myThemes.getIconColor(context),
-                          ),
-                          onRatingUpdate: (rating) {},
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Center(
-                        child: TextButton(
+                        IconButton(
                           onPressed: () {},
-                          child: Text(
-                            'Write a comment',
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: myThemes.getIconColor(context)),
+                          icon: const Icon(
+                            EvaIcons.arrowCircleRightOutline,
+                            size: 25,
                           ),
+                        )
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 15,
+                  ),
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 25),
+                      child: Text(
+                        widget.spotModel.descriptionHeader,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: TextStyle(
+                          color: myThemes.getFontwithOpacity(context, .6),
+                          fontSize: 15,
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-                const Center(
-                  child: Text(
-                    'Comment Section Here below',
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  const SizedBox(
+                    height: 20,
                   ),
-                ),
-              ],
+                  SizedBox(
+                    height: 175,
+                    width: MediaQuery.of(context).size.width,
+                    child: CarouselSlider.builder(
+                      itemCount: widget.spotModel.images.length,
+                      itemBuilder: (context, index, realIndex) {
+                        final images = widget.spotModel.images[index];
+                        return buildImage(images, index);
+                      },
+                      options: CarouselOptions(
+                        viewportFraction: 0.9,
+                        enableInfiniteScroll: true,
+                        autoPlay: true,
+                        autoPlayInterval: const Duration(seconds: 5),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Rate this Attraction',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        const Text(
+                          'Tell others what you think',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Center(
+                          child: RatingBar.builder(
+                            itemSize: 35,
+                            itemPadding:
+                                const EdgeInsets.symmetric(horizontal: 10),
+                            minRating: 1,
+                            itemBuilder: (context, _) => Icon(
+                              EvaIcons.star,
+                              color: myThemes.getIconColor(context),
+                            ),
+                            onRatingUpdate: (rating) {},
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Center(
+                          child: TextButton(
+                            onPressed: () {},
+                            child: Text(
+                              'Write a comment',
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: myThemes.getIconColor(context)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Center(
+                    child: Text(
+                      'Comment Section Here below',
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -374,10 +374,28 @@ Widget makeDismissable(
       child: GestureDetector(onTap: () {}, child: child),
     );
 
+Widget buildNavigateButton(BuildContext context) =>
+    FloatingActionButton.extended(
+      backgroundColor: myThemes.getIconColorDarkSecondary(context),
+      icon: Icon(
+        EvaIcons.navigation2,
+        color: myThemes.getFontAllWhite(context),
+      ),
+      label: Text(
+        "Navigate",
+        style: TextStyle(color: myThemes.getFontAllWhite(context)),
+      ),
+      onPressed: () {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => const MapScreen()));
+      },
+    );
+
 class GalleryWidget extends StatefulWidget {
   final List<String> urlImages;
 
-  GalleryWidget({
+  const GalleryWidget({
+    super.key,
     required this.urlImages,
   });
 

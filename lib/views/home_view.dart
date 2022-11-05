@@ -23,7 +23,7 @@ class _HomewViewState extends State<HomewView> {
   List<SpotModel> food = [];
   List<SpotModel> activities = [];
 
-  var rand = Random().nextInt(3) + 2;
+  var rand = Random();
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +107,7 @@ class _HomewViewState extends State<HomewView> {
                     ));
           },
           child: Card(
-            color: Colors.transparent,
+            elevation: 1,
             child: Padding(
               padding: const EdgeInsets.all(5),
               child: Column(
@@ -115,31 +115,32 @@ class _HomewViewState extends State<HomewView> {
                   Container(
                     decoration: BoxDecoration(
                       color: myThemes.getPrimaryColor(context),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: const BorderRadius.vertical(
+                          bottom: Radius.circular(10),
+                          top: Radius.circular(20)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(.2),
+                          color: Colors.black.withOpacity(.1),
                           spreadRadius: .1,
                           blurRadius: .1,
                         )
                       ],
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: const BorderRadius.vertical(
+                          bottom: Radius.circular(10),
+                          top: Radius.circular(20)),
                       child: Container(
                         height: 125,
                         width: 260,
-                        child: CarouselSlider.builder(
-                          itemCount: currentModel.images.length,
-                          itemBuilder: (context, index, realIndex) {
-                            final images = currentModel.images[index];
-                            return buildImage(images, index);
-                          },
-                          options: CarouselOptions(
-                              enlargeCenterPage: false,
-                              viewportFraction: 1,
-                              autoPlay: true,
-                              autoPlayInterval: const Duration(seconds: 4)),
+                        child: Container(
+                          width: 260,
+                          color: Colors.grey,
+                          child: Image.network(
+                            currentModel.images[
+                                rand.nextInt(currentModel.images.length)],
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),

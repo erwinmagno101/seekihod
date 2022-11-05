@@ -55,6 +55,7 @@ dependencies:
   email_validator: ^2.1.17
   file_picker: ^5.2.0+1
   firebase_storage: ^10.3.11
+  syncfusion_flutter_calendar: ^20.3.52
 
 
 dev_dependencies:
