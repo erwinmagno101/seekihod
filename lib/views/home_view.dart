@@ -107,7 +107,7 @@ class _HomewViewState extends State<HomewView> {
                     ));
           },
           child: Card(
-            elevation: 1,
+            color: myThemes.getSecondaryColor(context).withOpacity(.5),
             child: Padding(
               padding: const EdgeInsets.all(5),
               child: Column(
@@ -120,7 +120,6 @@ class _HomewViewState extends State<HomewView> {
                           top: Radius.circular(20)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(.1),
                           spreadRadius: .1,
                           blurRadius: .1,
                         )

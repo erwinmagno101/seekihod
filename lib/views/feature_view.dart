@@ -1,10 +1,15 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:seekihod/UI/theme_provider.dart';
+import 'package:seekihod/models/GlobalVar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/NewsModel.dart';
 import '../models/SpotModel.dart';
+import '../pages/spot_page.dart';
 
 class FeatureView extends StatefulWidget {
   const FeatureView({Key? key}) : super(key: key);
@@ -20,6 +25,8 @@ class _FeatureViewState extends State<FeatureView> {
   List<SpotModel> spotList = [];
 
   MyThemes myThemes = MyThemes();
+  globalVar global = globalVar();
+  Random rand = Random();
 
   @override
   Widget build(BuildContext context) {
@@ -49,13 +56,88 @@ class _FeatureViewState extends State<FeatureView> {
               const SizedBox(
                 height: 15,
               ),
-              Container(
-                height: 250,
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Card(),
+              StreamBuilder<List<SpotModel>>(
+                stream: readSpots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    List<SpotModel> featureList = snapshot.data!;
+                    globalVar.featureModel ??=
+                        featureList[rand.nextInt(featureList.length)];
+                    return Container(
+                      height: 270,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Stack(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: 15, right: 15, bottom: 25, top: 15),
+                            child: InkWell(
+                              onTap: () {
+                                showModalBottomSheet(
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    context: context,
+                                    builder: (context) => SpotPage(
+                                          spotModel: globalVar.featureModel!,
+                                        ));
+                              },
+                              child: Card(
+                                child: Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    if (globalVar.featureModel != null)
+                                      Image.network(
+                                        globalVar.featureModel!.imgUrl,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            Colors.transparent,
+                                            Colors.black.withOpacity(.3),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    if (globalVar.featureModel != null)
+                                      Align(
+                                        alignment: Alignment.bottomCenter,
+                                        child: Text(
+                                          globalVar.featureModel!.name,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontSize: 25,
+                                              color: myThemes
+                                                  .getFontAllWhite(context),
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const Align(
+                            alignment: Alignment.topRight,
+                            child: Icon(
+                              EvaIcons.star,
+                              color: Colors.yellow,
+                              size: 70,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    return Center(child: Text("No data"));
+                  }
+                },
               ),
               const SizedBox(
                 height: 15,
@@ -71,18 +153,29 @@ class _FeatureViewState extends State<FeatureView> {
               const SizedBox(
                 height: 5,
               ),
-              Container(
-                height: 150,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 10,
-                  itemBuilder: ((context, index) {
+              StreamBuilder<List<SpotModel>>(
+                stream: readSpots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    spotList = snapshot.data!;
+
                     return Container(
-                      child: Card(),
-                      width: 150,
+                      height: 150,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: 5,
+                        itemBuilder: ((context, index) {
+                          SpotModel currentModel = spotList[index];
+                          return seeMoreListTile(currentModel: currentModel);
+                        }),
+                      ),
                     );
-                  }),
-                ),
+                  } else {
+                    return Center(
+                      child: Text("No Date"),
+                    );
+                  }
+                },
               ),
               const SizedBox(
                 height: 15,
@@ -121,6 +214,63 @@ class _FeatureViewState extends State<FeatureView> {
     );
   }
 
+  Widget seeMoreListTile({required SpotModel currentModel}) {
+    return InkWell(
+      onTap: () {
+        showModalBottomSheet(
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            context: context,
+            builder: (context) => SpotPage(
+                  spotModel: currentModel,
+                ));
+      },
+      child: Card(
+        child: Container(
+          width: 150,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.network(
+                currentModel.imgUrl,
+                fit: BoxFit.cover,
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withOpacity(.8),
+                    ],
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: 15,
+                  ),
+                  child: Text(
+                    currentModel.name,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: myThemes.getFontAllWhite(context),
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Stream<List<NewsModel>> readContent() => FirebaseFirestore.instance
       .collection('Content')
       .snapshots()
@@ -148,10 +298,74 @@ class _FeatureViewState extends State<FeatureView> {
               itemCount: contentType.length,
               itemBuilder: ((context, index) {
                 NewsModel currentFeatureModel = contentType[index];
-                return Card(
-                  child: Container(
-                    width: MediaQuery.of(context).size.width - 30,
-                    child: Text(currentFeatureModel.title),
+                return InkWell(
+                  onTap: () async {
+                    final url = Uri.parse(currentFeatureModel.link);
+                    if (await canLaunchUrl(url)) {
+                      await launchUrl(
+                        url,
+                        webViewConfiguration:
+                            const WebViewConfiguration(enableJavaScript: true),
+                        mode: LaunchMode.externalApplication,
+                      );
+                    } else {
+                      throw 'Could not launch $url';
+                    }
+                  },
+                  child: Card(
+                    child: Container(
+                      width: MediaQuery.of(context).size.width / 1.3,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.network(
+                            currentFeatureModel.imgUrl,
+                            fit: BoxFit.cover,
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(.8),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    currentFeatureModel.title,
+                                    style: TextStyle(
+                                        color:
+                                            myThemes.getFontAllWhite(context),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                  Text(
+                                    currentFeatureModel.description,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
                   ),
                 );
               }),

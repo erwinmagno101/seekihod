@@ -34,7 +34,7 @@ class _SpotPageState extends State<SpotPage> {
       child: DraggableScrollableSheet(
         initialChildSize: .7,
         maxChildSize: .9,
-        minChildSize: .5,
+        minChildSize: .6,
         builder: (_, controller) => Scaffold(
           backgroundColor: Colors.transparent,
           floatingActionButton: buildNavigateButton(context),
@@ -144,7 +144,7 @@ class _SpotPageState extends State<SpotPage> {
                                       ],
                                     ),
                                   ),
-                                  Spacer(
+                                  const Spacer(
                                     flex: 1,
                                   ),
                                   Expanded(
