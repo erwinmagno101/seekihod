@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:seekihod/models/EventModel.dart';
 import 'package:seekihod/models/NewsModel.dart';
+import 'package:seekihod/pages/event_page.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../models/SpotModel.dart';
@@ -61,15 +62,80 @@ class _EventsViewState extends State<EventsView> {
                             itemCount: eventsList.length,
                             itemBuilder: (context, index) {
                               EventModel currentEventModel = eventsList[index];
-                              return Card(
+                              return InkWell(
+                                onTap: () {
+                                  showModalBottomSheet(
+                                      isScrollControlled: true,
+                                      backgroundColor: Colors.transparent,
+                                      context: context,
+                                      builder: (context) => EventPage(
+                                            eventModel: currentEventModel,
+                                          ));
+                                },
                                 child: Container(
                                   width:
                                       MediaQuery.of(context).size.width / 1.2,
-                                  child: Center(
-                                    child: Text(
-                                      currentEventModel.title,
-                                      style: const TextStyle(fontSize: 20),
-                                    ),
+                                  child: Card(
+                                    child: Center(
+                                        child: Stack(
+                                      fit: StackFit.expand,
+                                      children: [
+                                        Image.network(
+                                          currentEventModel.imgUrl,
+                                          fit: BoxFit.cover,
+                                        ),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                Colors.black.withOpacity(.7),
+                                                Colors.transparent,
+                                              ],
+                                              begin: Alignment.bottomCenter,
+                                              end: Alignment.topCenter,
+                                            ),
+                                          ),
+                                        ),
+                                        Align(
+                                          alignment: Alignment.bottomRight,
+                                          child: Padding(
+                                            padding: EdgeInsets.all(15),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                  currentEventModel.title,
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 25,
+                                                    color: myThemes
+                                                        .getFontAllWhite(
+                                                            context),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  currentEventModel.description,
+                                                  maxLines: 3,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: myThemes
+                                                        .getFontAllWhite(
+                                                            context),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    )),
                                   ),
                                 ),
                               );

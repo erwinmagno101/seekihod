@@ -72,8 +72,8 @@ class _FeatureViewState extends State<FeatureView> {
                       child: Stack(
                         children: [
                           Padding(
-                            padding: EdgeInsets.only(
-                                left: 15, right: 15, bottom: 25, top: 15),
+                            padding:
+                                EdgeInsets.only(left: 15, right: 15, top: 15),
                             child: InkWell(
                               onTap: () {
                                 showModalBottomSheet(
@@ -100,7 +100,7 @@ class _FeatureViewState extends State<FeatureView> {
                                           end: Alignment.bottomCenter,
                                           colors: [
                                             Colors.transparent,
-                                            Colors.black.withOpacity(.3),
+                                            Colors.black.withOpacity(.6),
                                           ],
                                         ),
                                       ),
@@ -108,14 +108,40 @@ class _FeatureViewState extends State<FeatureView> {
                                     if (globalVar.featureModel != null)
                                       Align(
                                         alignment: Alignment.bottomCenter,
-                                        child: Text(
-                                          globalVar.featureModel!.name,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              fontSize: 25,
-                                              color: myThemes
-                                                  .getFontAllWhite(context),
-                                              fontWeight: FontWeight.bold),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                globalVar.featureModel!.name,
+                                                textAlign: TextAlign.center,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                    fontSize: 25,
+                                                    color: myThemes
+                                                        .getFontAllWhite(
+                                                            context),
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(
+                                                globalVar.featureModel!
+                                                    .descriptionHeader,
+                                                textAlign: TextAlign.center,
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 3,
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: myThemes
+                                                        .getFontAllWhite(
+                                                            context),
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       )
                                   ],
@@ -160,7 +186,7 @@ class _FeatureViewState extends State<FeatureView> {
                     spotList = snapshot.data!;
 
                     return Container(
-                      height: 150,
+                      height: 100,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: 5,
@@ -227,7 +253,7 @@ class _FeatureViewState extends State<FeatureView> {
       },
       child: Card(
         child: Container(
-          width: 150,
+          width: 100,
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -259,7 +285,7 @@ class _FeatureViewState extends State<FeatureView> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         color: myThemes.getFontAllWhite(context),
-                        fontSize: 15,
+                        fontSize: 10,
                         fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -280,7 +306,6 @@ class _FeatureViewState extends State<FeatureView> {
   Widget getContentType(List<NewsModel> contentType, String type) {
     return Container(
       height: 200,
-      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: StreamBuilder<List<NewsModel>>(
         stream: readContent(),
         builder: (context, snapshot) {
@@ -352,12 +377,16 @@ class _FeatureViewState extends State<FeatureView> {
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18),
                                     overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
+                                    maxLines: 2,
                                   ),
                                   Text(
                                     currentFeatureModel.description,
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        color:
+                                            myThemes.getFontAllWhite(context),
+                                        fontSize: 12),
                                   ),
                                 ],
                               ),

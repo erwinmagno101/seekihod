@@ -118,7 +118,7 @@ class _HomewViewState extends State<HomewView> {
                       borderRadius: const BorderRadius.vertical(
                           bottom: Radius.circular(10),
                           top: Radius.circular(20)),
-                      boxShadow: [
+                      boxShadow: const [
                         BoxShadow(
                           spreadRadius: .1,
                           blurRadius: .1,
@@ -201,7 +201,8 @@ class _HomewViewState extends State<HomewView> {
                               currentModel.name,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 15),
+                              style: const TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),
                             ),
                             Text(
                               currentModel.address,

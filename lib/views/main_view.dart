@@ -28,7 +28,7 @@ var img;
 var userName;
 
 class _MainViewState extends State<MainView> {
-  int index = 1;
+  int index = 2;
 
   final screens = [
     const HomewView(),

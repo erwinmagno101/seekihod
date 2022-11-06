@@ -5,6 +5,8 @@ class EventModel {
   String dateEnd;
   String imgUrl;
   String location;
+  String link;
+
   var highlights = [];
 
   EventModel({
@@ -15,6 +17,7 @@ class EventModel {
     required this.imgUrl,
     required this.highlights,
     required this.location,
+    required this.link,
   });
 
   Map<String, dynamic> toJson() => {
@@ -25,6 +28,7 @@ class EventModel {
         'imgUrl': imgUrl,
         'highlights': highlights,
         'location': location,
+        'link': link,
       };
 
   static EventModel fromJson(Map<String, dynamic> json) => EventModel(
@@ -35,5 +39,6 @@ class EventModel {
         imgUrl: json['imgUrl'],
         highlights: json['highlights'],
         location: json['location'],
+        link: json['link'],
       );
 }
