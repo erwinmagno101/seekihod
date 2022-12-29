@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:line_icons/line_icon.dart';
 import 'package:seekihod/copyrights_page.dart';
 import 'package:http/http.dart' as http;
 import "dart:convert" as convert;
@@ -14,10 +17,52 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => MapScreenState();
 }
 
-class MapScreenState extends State<MapScreen> {
+class MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
+  late final MapController mapController;
+
   final String apiKey = "BMs6oew1GM8aJTAwfJOgAsTtZTgqqOLT";
   var currentLocation;
   final destinationLocation = LatLng(9.2176346, 123.6679914);
+
+  @override
+  void initState() {
+    super.initState();
+    mapController = MapController();
+  }
+
+  void _animatedMapMove(LatLng destLocation, double destZoom) {
+    // Create some tweens. These serve to split up the transition from one location to another.
+    // In our case, we want to split the transition be<tween> our current map center and the destination.
+    final latTween = Tween<double>(
+        begin: mapController.center.latitude, end: destLocation.latitude);
+    final lngTween = Tween<double>(
+        begin: mapController.center.longitude, end: destLocation.longitude);
+    final zoomTween = Tween<double>(begin: mapController.zoom, end: destZoom);
+
+    // Create a animation controller that has a duration and a TickerProvider.
+    final controller = AnimationController(
+        duration: const Duration(milliseconds: 500), vsync: this);
+    // The animation determines what path the animation will take. You can try different Curves values, although I found
+    // fastOutSlowIn to be my favorite.
+    final Animation<double> animation =
+        CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
+
+    controller.addListener(() {
+      mapController.move(
+          LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
+          zoomTween.evaluate(animation));
+    });
+
+    animation.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        controller.dispose();
+      } else if (status == AnimationStatus.dismissed) {
+        controller.dispose();
+      }
+    });
+
+    controller.forward();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +75,7 @@ class MapScreenState extends State<MapScreen> {
                 LatLng(snapshot.data!.latitude, snapshot.data!.longitude);
             String curLocLat = snapshot.data!.latitude.toString();
             String curLocLon = snapshot.data!.longitude.toString();
+            var centerView = currentLocation;
             return FutureBuilder<http.Response>(
                 future: getRoute(
                     curLocLat,
@@ -40,6 +86,7 @@ class MapScreenState extends State<MapScreen> {
                   if (snapshot.hasData) {
                     http.Response result = snapshot.data!;
                     Map<String, dynamic> decodedJson = json.decode(result.body);
+                    print(decodedJson);
                     List<dynamic> routes = decodedJson['routes'];
                     Map<String, dynamic> summary1 = routes[0];
                     List<dynamic> legs = summary1['legs'];
@@ -57,15 +104,16 @@ class MapScreenState extends State<MapScreen> {
                         child: Stack(
                           children: [
                             FlutterMap(
+                              mapController: mapController,
                               options: MapOptions(
-                                center: currentLocation,
-                                zoom: 13.0,
-                              ),
-                              children: [
+                                  center: centerView,
+                                  zoom: 15.0,
+                                  minZoom: 11,
+                                  maxZoom: 15),
+                              nonRotatedChildren: [
                                 TileLayer(
                                   urlTemplate:
-                                      "https://api.tomtom.com/map/1/tile/basic/main/"
-                                      "{z}/{x}/{y}.png?key={apiKey}",
+                                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                                   additionalOptions: {"apiKey": apiKey},
                                 ),
                                 MarkerLayer(
@@ -98,26 +146,31 @@ class MapScreenState extends State<MapScreen> {
                                 )
                               ],
                             ),
-                            Container(
-                              padding: EdgeInsets.all(20),
-                              alignment: Alignment.bottomLeft,
-                              child: Image.asset(
-                                'lib/assets/images/tomtomLogo.png',
-                                width: 100,
-                              ),
-                            ),
                           ],
                         ),
                       ),
-                      floatingActionButton: FloatingActionButton(
-                        child: Icon(Icons.copyright),
-                        onPressed: () async {
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => CopyrightsPage(
-                          //             copyrightsText: parseCopyrightsResponse(response))));
-                        },
+                      floatingActionButton: SpeedDial(
+                        spacing: 20,
+                        spaceBetweenChildren: 20,
+                        overlayColor: Colors.black,
+                        overlayOpacity: 0.3,
+                        animatedIcon: AnimatedIcons.menu_close,
+                        children: [
+                          SpeedDialChild(
+                            child: Icon(Icons.person),
+                            label: 'Origin',
+                            onTap: () {
+                              _animatedMapMove(currentLocation, 13);
+                            },
+                          ),
+                          SpeedDialChild(
+                            child: Icon(Icons.gps_fixed),
+                            label: 'Destination',
+                            onTap: () {
+                              _animatedMapMove(destinationLocation, 13);
+                            },
+                          ),
+                        ],
                       ),
                     );
                   } else {

@@ -64,6 +64,7 @@ dependencies:
   google_maps_webservice: ^0.0.19
   flutter_google_places: ^0.3.0
   geolocator: ^9.0.2
+  flutter_speed_dial: ^6.2.0
 
 
 dev_dependencies:
