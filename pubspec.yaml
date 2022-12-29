@@ -57,6 +57,13 @@ dependencies:
   firebase_storage: ^10.3.11
   syncfusion_flutter_calendar: ^20.3.52
   url_launcher: ^6.1.6
+  flutter_map: ^3.1.0
+  latlong2: ^0.8.1
+  convert: ^3.1.1
+  google_map_polyline_new: ^0.3.0+2
+  google_maps_webservice: ^0.0.19
+  flutter_google_places: ^0.3.0
+  geolocator: ^9.0.2
 
 
 dev_dependencies:
