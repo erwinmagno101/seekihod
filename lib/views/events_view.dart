@@ -76,6 +76,7 @@ class _EventsViewState extends State<EventsView> {
                                   width:
                                       MediaQuery.of(context).size.width / 1.2,
                                   child: Card(
+                                    color: Colors.transparent,
                                     child: Center(
                                         child: Stack(
                                       fit: StackFit.expand,
@@ -83,6 +84,19 @@ class _EventsViewState extends State<EventsView> {
                                         Image.network(
                                           currentEventModel.imgUrl,
                                           fit: BoxFit.cover,
+                                          errorBuilder: (BuildContext context,
+                                              Object exception,
+                                              StackTrace? stackTrace) {
+                                            return Center(
+                                                child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: const [
+                                                Icon(Icons.error_outline),
+                                                Text("Failed to load Images"),
+                                              ],
+                                            ));
+                                          },
                                         ),
                                         Container(
                                           decoration: BoxDecoration(

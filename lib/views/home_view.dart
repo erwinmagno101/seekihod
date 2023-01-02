@@ -107,24 +107,12 @@ class _HomewViewState extends State<HomewView> {
                     ));
           },
           child: Card(
-            color: myThemes.getSecondaryColor(context).withOpacity(.5),
+            color: Colors.transparent,
             child: Padding(
               padding: const EdgeInsets.all(5),
               child: Column(
                 children: <Widget>[
                   Container(
-                    decoration: BoxDecoration(
-                      color: myThemes.getPrimaryColor(context),
-                      borderRadius: const BorderRadius.vertical(
-                          bottom: Radius.circular(10),
-                          top: Radius.circular(20)),
-                      boxShadow: const [
-                        BoxShadow(
-                          spreadRadius: .1,
-                          blurRadius: .1,
-                        )
-                      ],
-                    ),
                     child: ClipRRect(
                       borderRadius: const BorderRadius.vertical(
                           bottom: Radius.circular(10),
@@ -134,11 +122,39 @@ class _HomewViewState extends State<HomewView> {
                         width: 260,
                         child: Container(
                           width: 260,
-                          color: Colors.grey,
-                          child: Image.network(
-                            currentModel.images[
-                                rand.nextInt(currentModel.images.length)],
-                            fit: BoxFit.cover,
+                          color: Colors.transparent,
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              Image.network(
+                                currentModel.images[
+                                    rand.nextInt(currentModel.images.length)],
+                                fit: BoxFit.cover,
+                                errorBuilder: (BuildContext context,
+                                    Object exception, StackTrace? stackTrace) {
+                                  return Center(
+                                      child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Icon(Icons.error_outline),
+                                      Text("Failed to load Images"),
+                                    ],
+                                  ));
+                                },
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.transparent,
+                                      Colors.black.withOpacity(.6),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -150,26 +166,23 @@ class _HomewViewState extends State<HomewView> {
                   Row(
                     children: <Widget>[
                       Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(.2),
-                              spreadRadius: .1,
-                              blurRadius: .1,
-                            )
-                          ],
-                        ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: Container(
                             width: 75,
                             height: 70,
-                            color: Colors.blue,
+                            color: Colors.transparent,
                             child: Stack(
                               fit: StackFit.expand,
                               children: [
                                 Image.network(
+                                  errorBuilder: (BuildContext context,
+                                      Object exception,
+                                      StackTrace? stackTrace) {
+                                    return const Center(
+                                        child: Center(
+                                            child: Icon(Icons.error_outline)));
+                                  },
                                   currentModel.imgUrl,
                                   fit: BoxFit.cover,
                                 ),
@@ -180,11 +193,11 @@ class _HomewViewState extends State<HomewView> {
                                       end: Alignment.bottomCenter,
                                       colors: [
                                         Colors.transparent,
-                                        Colors.black.withOpacity(.3)
+                                        Colors.black.withOpacity(.6),
                                       ],
                                     ),
                                   ),
-                                )
+                                ),
                               ],
                             ),
                           ),
@@ -328,7 +341,7 @@ class _HomewViewState extends State<HomewView> {
             );
           } else {
             return const Center(
-              child: Text("No Data"),
+              child: CircularProgressIndicator(),
             );
           }
         },

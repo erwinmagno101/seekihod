@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:geolocator/geolocator.dart';
@@ -6,12 +7,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:line_icons/line_icon.dart';
+import 'package:seekihod/UI/theme_provider.dart';
 import 'package:seekihod/copyrights_page.dart';
 import 'package:http/http.dart' as http;
 import "dart:convert" as convert;
+import 'dart:math';
+
+import 'package:seekihod/models/SpotModel.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({Key? key}) : super(key: key);
+  final SpotModel spotModel;
+  const MapScreen({Key? key, required this.spotModel}) : super(key: key);
 
   @override
   State<MapScreen> createState() => MapScreenState();
@@ -22,7 +28,7 @@ class MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
   final String apiKey = "BMs6oew1GM8aJTAwfJOgAsTtZTgqqOLT";
   var currentLocation;
-  final destinationLocation = LatLng(9.2176346, 123.6679914);
+  final MyThemes myThemes = MyThemes();
 
   @override
   void initState() {
@@ -66,11 +72,13 @@ class MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final destinationLocation = LatLng(widget.spotModel.geoPoint.latitude,
+        widget.spotModel.geoPoint.longitude);
+
     return FutureBuilder<Position>(
         future: _determinePosition(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            print(snapshot.data!.latitude);
             currentLocation =
                 LatLng(snapshot.data!.latitude, snapshot.data!.longitude);
             String curLocLat = snapshot.data!.latitude.toString();
@@ -86,14 +94,19 @@ class MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   if (snapshot.hasData) {
                     http.Response result = snapshot.data!;
                     Map<String, dynamic> decodedJson = json.decode(result.body);
-                    print(decodedJson);
                     List<dynamic> routes = decodedJson['routes'];
                     Map<String, dynamic> summary1 = routes[0];
+                    Map<String, dynamic> travel = routes[0]['summary'];
                     List<dynamic> legs = summary1['legs'];
                     Map<String, dynamic> summary2 = legs[0];
                     List<dynamic> points = summary2['points'];
                     List<LatLng> point = List.empty(growable: true);
-
+                    String lengthInMeters =
+                        (roundDouble(travel['lengthInMeters'] / 1000, 1))
+                            .toString();
+                    String travelTimeInSeconds =
+                        (roundDouble(travel['travelTimeInSeconds'] / 60, 1))
+                            .toString();
                     for (int i = 0; i < points.length; i++) {
                       point.add(LatLng(
                           points[i]['latitude'], points[i]['longitude']));
@@ -146,25 +159,99 @@ class MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                                 )
                               ],
                             ),
+                            Align(
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                margin: const EdgeInsets.only(
+                                    top: 50, left: 20, right: 20),
+                                padding: const EdgeInsets.all(10),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      widget.spotModel.name,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "$lengthInMeters Kilometers",
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.blue),
+                                        ),
+                                        const Text(
+                                          " In Distance",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const Text(
+                                          "Approximately ",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black),
+                                        ),
+                                        Text(
+                                          " $travelTimeInSeconds Minutes",
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.green),
+                                        ),
+                                        const Text(
+                                          " Travel Time",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ),
+                            )
                           ],
                         ),
                       ),
                       floatingActionButton: SpeedDial(
-                        spacing: 20,
-                        spaceBetweenChildren: 20,
+                        backgroundColor: myThemes.getIconColor(context),
+                        spacing: 5,
+                        spaceBetweenChildren: 5,
                         overlayColor: Colors.black,
                         overlayOpacity: 0.3,
                         animatedIcon: AnimatedIcons.menu_close,
                         children: [
                           SpeedDialChild(
-                            child: Icon(Icons.person),
+                            child: const Icon(Icons.person),
                             label: 'Origin',
                             onTap: () {
                               _animatedMapMove(currentLocation, 13);
                             },
                           ),
                           SpeedDialChild(
-                            child: Icon(Icons.gps_fixed),
+                            child: const Icon(Icons.gps_fixed),
                             label: 'Destination',
                             onTap: () {
                               _animatedMapMove(destinationLocation, 13);
@@ -174,7 +261,7 @@ class MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                       ),
                     );
                   } else {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   }
                 });
           } else {
@@ -265,5 +352,10 @@ class MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
     return await Geolocator.getCurrentPosition();
+  }
+
+  double roundDouble(double value, int places) {
+    double mod = pow(10.0, places) as double;
+    return ((value * mod).round().toDouble() / mod);
   }
 }

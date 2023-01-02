@@ -85,6 +85,7 @@ class _FeatureViewState extends State<FeatureView> {
                                         ));
                               },
                               child: Card(
+                                color: Colors.transparent,
                                 child: Stack(
                                   fit: StackFit.expand,
                                   children: [
@@ -92,6 +93,19 @@ class _FeatureViewState extends State<FeatureView> {
                                       Image.network(
                                         globalVar.featureModel!.imgUrl,
                                         fit: BoxFit.cover,
+                                        errorBuilder: (BuildContext context,
+                                            Object exception,
+                                            StackTrace? stackTrace) {
+                                          return Center(
+                                              child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: const [
+                                              Icon(Icons.error_outline),
+                                              Text("Failed to load Images"),
+                                            ],
+                                          ));
+                                        },
                                       ),
                                     Container(
                                       decoration: BoxDecoration(
@@ -252,6 +266,7 @@ class _FeatureViewState extends State<FeatureView> {
                 ));
       },
       child: Card(
+        color: Colors.transparent,
         child: Container(
           width: 100,
           child: Stack(
@@ -260,6 +275,11 @@ class _FeatureViewState extends State<FeatureView> {
               Image.network(
                 currentModel.imgUrl,
                 fit: BoxFit.cover,
+                errorBuilder: (BuildContext context, Object exception,
+                    StackTrace? stackTrace) {
+                  return const Center(
+                      child: Center(child: Icon(Icons.error_outline)));
+                },
               ),
               Container(
                 decoration: BoxDecoration(
@@ -338,6 +358,7 @@ class _FeatureViewState extends State<FeatureView> {
                     }
                   },
                   child: Card(
+                    color: Colors.transparent,
                     child: Container(
                       width: MediaQuery.of(context).size.width / 1.3,
                       child: Stack(
@@ -346,6 +367,17 @@ class _FeatureViewState extends State<FeatureView> {
                           Image.network(
                             currentFeatureModel.imgUrl,
                             fit: BoxFit.cover,
+                            errorBuilder: (BuildContext context,
+                                Object exception, StackTrace? stackTrace) {
+                              return Center(
+                                  child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  Icon(Icons.error_outline),
+                                  Text("Failed to load Images"),
+                                ],
+                              ));
+                            },
                           ),
                           Container(
                             decoration: BoxDecoration(

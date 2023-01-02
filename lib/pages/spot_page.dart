@@ -23,6 +23,7 @@ class _SpotPageState extends State<SpotPage> {
   List<String> urlImages = [];
 
   int activeIndex = 0;
+  bool show = false;
   @override
   Widget build(BuildContext context) {
     if (urlImages.isEmpty) {
@@ -37,7 +38,7 @@ class _SpotPageState extends State<SpotPage> {
         minChildSize: .6,
         builder: (_, controller) => Scaffold(
           backgroundColor: Colors.transparent,
-          floatingActionButton: buildNavigateButton(context),
+          floatingActionButton: buildNavigateButton(context, widget.spotModel),
           body: Container(
             decoration: BoxDecoration(
               color: myThemes.getPrimaryColor(context),
@@ -72,6 +73,17 @@ class _SpotPageState extends State<SpotPage> {
                         Image.network(
                           widget.spotModel.imgUrl,
                           fit: BoxFit.cover,
+                          errorBuilder: (BuildContext context, Object exception,
+                              StackTrace? stackTrace) {
+                            return Center(
+                                child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(Icons.error_outline),
+                                Text("Failed to load Images"),
+                              ],
+                            ));
+                          },
                         ),
                         Container(
                           decoration: BoxDecoration(
@@ -210,11 +222,24 @@ class _SpotPageState extends State<SpotPage> {
                           style: TextStyle(fontSize: 20),
                         ),
                         IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            EvaIcons.arrowCircleRightOutline,
-                            size: 25,
-                          ),
+                          onPressed: () {
+                            setState(() {
+                              if (show == false) {
+                                show = true;
+                                return;
+                              }
+                              show = false;
+                            });
+                          },
+                          icon: show
+                              ? const Icon(
+                                  EvaIcons.arrowIosUpward,
+                                  size: 25,
+                                )
+                              : const Icon(
+                                  EvaIcons.arrowIosDownward,
+                                  size: 25,
+                                ),
                         )
                       ],
                     ),
@@ -227,8 +252,8 @@ class _SpotPageState extends State<SpotPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 25),
                       child: Text(
                         widget.spotModel.descriptionHeader,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
+                        overflow: !show ? TextOverflow.ellipsis : null,
+                        maxLines: !show ? 2 : null,
                         style: TextStyle(
                           color: myThemes.getFontwithOpacity(context, .6),
                           fontSize: 15,
@@ -236,6 +261,23 @@ class _SpotPageState extends State<SpotPage> {
                       ),
                     ),
                   ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  if (show)
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 25),
+                        child: Text(
+                          widget.spotModel.description,
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            color: myThemes.getFontwithOpacity(context, .6),
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ),
                   const SizedBox(
                     height: 20,
                   ),
@@ -342,6 +384,17 @@ class _SpotPageState extends State<SpotPage> {
               child: Image.network(
                 urlImage,
                 fit: BoxFit.cover,
+                errorBuilder: (BuildContext context, Object exception,
+                    StackTrace? stackTrace) {
+                  return Center(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.error_outline),
+                      Text("Failed to load Images"),
+                    ],
+                  ));
+                },
               ),
             ),
           ),
@@ -374,7 +427,7 @@ Widget makeDismissable(
       child: GestureDetector(onTap: () {}, child: child),
     );
 
-Widget buildNavigateButton(BuildContext context) =>
+Widget buildNavigateButton(BuildContext context, SpotModel spotModel) =>
     FloatingActionButton.extended(
       backgroundColor: myThemes.getIconColorDarkSecondary(context),
       icon: Icon(
@@ -386,8 +439,8 @@ Widget buildNavigateButton(BuildContext context) =>
         style: TextStyle(color: myThemes.getFontAllWhite(context)),
       ),
       onPressed: () {
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => const MapScreen()));
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => MapScreen(spotModel: spotModel)));
       },
     );
 

@@ -335,10 +335,12 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
               title: Text('Dark mode'),
               trailing: ChangeThemeButtonWidget(),
             ),
-            const ListTile(
-              leading: Icon(EvaIcons.logOut),
-              title: Text('Sign out'),
-            ),
+            if (FirebaseAuth.instance.currentUser != null)
+              ListTile(
+                leading: const Icon(EvaIcons.logOut),
+                title: const Text('Sign out'),
+                onTap: () => FirebaseAuth.instance.signOut(),
+              ),
             Divider(
               color: myThemes.getIconColor(context),
               thickness: 1,
