@@ -65,6 +65,7 @@ dependencies:
   flutter_google_places: ^0.3.0
   geolocator: ^9.0.2
   flutter_speed_dial: ^6.2.0
+  flutter_password_strength: ^0.1.6
 
 
 dev_dependencies:

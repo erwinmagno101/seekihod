@@ -4,6 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:seekihod/pages/category_page.dart';
 import '../UI/theme_provider.dart';
 import '../models/SpotModel.dart';
 import '../pages/spot_page.dart';
@@ -23,10 +24,17 @@ class _HomewViewState extends State<HomewView> {
   List<SpotModel> food = [];
   List<SpotModel> activities = [];
 
+  List<SpotModel> model = [];
+  double screenHeight = 0;
+  double screenWidth = 0;
+
   var rand = Random();
 
   @override
   Widget build(BuildContext context) {
+    screenHeight = MediaQuery.of(context).size.height;
+    screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -95,7 +103,7 @@ class _HomewViewState extends State<HomewView> {
   }
 
   Widget listCard(SpotModel currentModel, BuildContext context) => SizedBox(
-        width: 275,
+        width: screenWidth / 1.5,
         child: InkWell(
           onTap: () {
             showModalBottomSheet(
@@ -111,6 +119,8 @@ class _HomewViewState extends State<HomewView> {
             child: Padding(
               padding: const EdgeInsets.all(5),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Container(
                     child: ClipRRect(
@@ -118,10 +128,9 @@ class _HomewViewState extends State<HomewView> {
                           bottom: Radius.circular(10),
                           top: Radius.circular(20)),
                       child: Container(
-                        height: 125,
-                        width: 260,
+                        height: (screenHeight / 4) / 2,
                         child: Container(
-                          width: 260,
+                          width: screenWidth / 1.5,
                           color: Colors.transparent,
                           child: Stack(
                             fit: StackFit.expand,
@@ -169,8 +178,8 @@ class _HomewViewState extends State<HomewView> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: Container(
-                            width: 75,
-                            height: 70,
+                            width: (screenWidth / 1.5) / 3.2,
+                            height: (screenHeight / 4) / 2.8,
                             color: Colors.transparent,
                             child: Stack(
                               fit: StackFit.expand,
@@ -206,7 +215,8 @@ class _HomewViewState extends State<HomewView> {
                       const SizedBox(
                         width: 25,
                       ),
-                      Flexible(
+                      Container(
+                        width: (screenWidth / 1.5) / 2,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -264,7 +274,10 @@ class _HomewViewState extends State<HomewView> {
     return thisModel;
   }
 
-  Widget categoryHeader(String type, String icon) {
+  Widget categoryHeader(
+    String type,
+    String icon,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 15,
@@ -301,7 +314,25 @@ class _HomewViewState extends State<HomewView> {
               ],
             ),
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                if (type == 'Tourist Spot') {
+                  model = getModels(results, 'spot');
+                }
+                if (type == 'Accommodation') {
+                  model = getModels(results, 'accommodation');
+                }
+                if (type == 'Food') {
+                  model = getModels(results, 'food');
+                }
+                if (type == 'Activity') {
+                  model = getModels(results, 'activity');
+                }
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => CategoryPage(
+                          currentModel: model,
+                          type: type,
+                        )));
+              },
               icon: const Icon(EvaIcons.arrowCircleRightOutline),
             )
           ],
@@ -312,13 +343,14 @@ class _HomewViewState extends State<HomewView> {
 
   Widget getListType(List<SpotModel> listType, String type) {
     return Container(
-      height: 225,
+      height: screenHeight / 4,
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: StreamBuilder<List<SpotModel>>(
         stream: readSpots(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             results = snapshot.data!;
+
             if (type == 'Tourist Spot') {
               listType = getModels(results, 'spot');
             }

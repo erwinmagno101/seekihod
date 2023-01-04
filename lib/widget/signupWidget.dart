@@ -10,6 +10,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_password_strength/flutter_password_strength.dart';
 import 'package:seekihod/models/GlobalVar.dart';
 import 'package:seekihod/views/main_view.dart';
 
@@ -36,6 +37,12 @@ class _SignUpWidgetState extends State<SignUpWidget> {
   final lastNameController = TextEditingController();
   final userNameController = TextEditingController();
   String urlDownload = "";
+  String _password = "";
+  String _message = "";
+  bool hidePass = true;
+  bool weakPass = false;
+  bool weakPassShow = false;
+  Color _messageColor = Colors.red;
 
   PlatformFile? pickedFile;
   UploadTask? uploadTask;
@@ -70,6 +77,8 @@ class _SignUpWidgetState extends State<SignUpWidget> {
 
   @override
   Widget build(BuildContext context) {
+    double _strength;
+
     setState(() {
       MainView();
     });
@@ -147,33 +156,132 @@ class _SignUpWidgetState extends State<SignUpWidget> {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: TextFormField(
-                  cursorColor: myThemes.getIconColor(context),
-                  style: const TextStyle(fontSize: 20),
-                  controller: passwordController,
-                  textInputAction: TextInputAction.next,
-                  decoration: textFieldDecoration('Password'),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) => value != null && value.length < 6
-                      ? 'Enter a minimuim of 6 characters'
-                      : null,
+                child: Stack(
+                  children: [
+                    TextFormField(
+                      onChanged: (value) {
+                        setState(() {
+                          _password = value;
+                        });
+                      },
+                      onSaved: (value) {
+                        setState(() {
+                          _password = value!;
+                        });
+                      },
+                      obscureText: hidePass,
+                      cursorColor: myThemes.getIconColor(context),
+                      style: const TextStyle(fontSize: 20),
+                      controller: passwordController,
+                      textInputAction: TextInputAction.next,
+                      decoration: textFieldDecoration('Password'),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) => value != null && value.length < 8
+                          ? 'Enter a minimuim of 8 characters'
+                          : null,
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            if (hidePass == true) {
+                              hidePass = false;
+                              return;
+                            }
+                            hidePass = true;
+                          });
+                        },
+                        icon: hidePass
+                            ? Icon(EvaIcons.eyeOff2)
+                            : Icon(EvaIcons.eye),
+                      ),
+                    )
+                  ],
                 ),
               ),
-              const SizedBox(
-                height: 15,
+              if (_password.isNotEmpty)
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 40),
+                  child: FlutterPasswordStrength(
+                    password: _password,
+                    height: 20,
+                    radius: 10,
+                    strengthCallback: (strength) {
+                      if (strength <= 1) {
+                        _message = "Strong";
+                        _messageColor = Colors.green;
+                        weakPassShow = false;
+                        weakPass = false;
+                      }
+                      if (strength < .8) {
+                        _message = "Moderate";
+                        _messageColor = Colors.blue;
+                        weakPassShow = false;
+                        weakPass = false;
+                      }
+                      if (strength < .5) {
+                        _message = "Weak";
+                        _messageColor = Colors.yellow;
+                        weakPass = true;
+                      }
+                      if (strength < .3) {
+                        _message = "Super Weak";
+                        _messageColor = Colors.orange;
+                        weakPass = true;
+                      }
+                      debugPrint(strength.toString());
+                    },
+                  ),
+                ),
+              if (_password.isNotEmpty)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Password Strength: "),
+                    Text(
+                      _message,
+                      style: TextStyle(color: _messageColor),
+                    ),
+                  ],
+                ),
+              SizedBox(
+                height: 10,
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: TextFormField(
-                  cursorColor: myThemes.getIconColor(context),
-                  style: const TextStyle(fontSize: 20),
-                  controller: confirmPasswordController,
-                  textInputAction: TextInputAction.next,
-                  decoration: textFieldDecoration('Confirm Password'),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) => value != passwordController.text
-                      ? 'Password does not match'
-                      : null,
+                child: Stack(
+                  children: [
+                    TextFormField(
+                      obscureText: hidePass,
+                      cursorColor: myThemes.getIconColor(context),
+                      style: const TextStyle(fontSize: 20),
+                      controller: confirmPasswordController,
+                      textInputAction: TextInputAction.next,
+                      decoration: textFieldDecoration('Confirm Password'),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) => value != passwordController.text
+                          ? 'Password does not match'
+                          : null,
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            if (hidePass == true) {
+                              hidePass = false;
+                              return;
+                            }
+                            hidePass = true;
+                          });
+                        },
+                        icon: hidePass
+                            ? Icon(EvaIcons.eyeOff2)
+                            : Icon(EvaIcons.eye),
+                      ),
+                    )
+                  ],
                 ),
               ),
               const SizedBox(
@@ -232,6 +340,15 @@ class _SignUpWidgetState extends State<SignUpWidget> {
               const SizedBox(
                 height: 30,
               ),
+              if (weakPassShow)
+                const Text(
+                  "Need a Strong Password",
+                  style: TextStyle(color: Colors.red),
+                ),
+              if (weakPassShow)
+                const SizedBox(
+                  height: 30,
+                ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 80),
                 child: ClipRRect(
@@ -285,6 +402,12 @@ class _SignUpWidgetState extends State<SignUpWidget> {
   Future signUp() async {
     final isValid = formKey.currentState!.validate();
     if (!isValid) return;
+    if (weakPass) {
+      setState(() {
+        weakPassShow = true;
+      });
+      return;
+    }
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -335,6 +458,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
     final docUser = FirebaseFirestore.instance.collection('User').doc(email);
 
     final json = {
+      'email': email,
       'firstName': firstName,
       'lastName': lastName,
       'userName': userName,
