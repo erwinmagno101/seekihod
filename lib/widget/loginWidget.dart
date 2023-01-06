@@ -3,14 +3,13 @@ import 'dart:ui';
 import 'package:email_validator/email_validator.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import 'package:seekihod/UI/theme_provider.dart';
-import 'package:seekihod/models/GlobalVar.dart';
 import 'package:seekihod/views/main_view.dart';
+import 'package:seekihod/widget/google_signin.dart';
 
 import '../main.dart';
 import '../models/Utils.dart';
@@ -29,7 +28,9 @@ class _LoginWidgetState extends State<LoginWidget> {
   final MyThemes myThemes = MyThemes();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final smsController = TextEditingController();
   final formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
@@ -39,198 +40,209 @@ class _LoginWidgetState extends State<LoginWidget> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        leading: BackButton(
-          color: myThemes.getIconColor(context),
-          onPressed: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      const MainView()), // this mymainpage is your page to refresh
-              (Route<dynamic> route) => false,
-            );
-          },
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(
-                height: 10,
+  Widget build(BuildContext context) => ChangeNotifierProvider(
+        create: (context) => GoogleSignInProvider(),
+        builder: (context, child) {
+          return Scaffold(
+            appBar: AppBar(
+              elevation: 0,
+              leading: BackButton(
+                color: myThemes.getIconColor(context),
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            const MainView()), // this mymainpage is your page to refresh
+                    (Route<dynamic> route) => false,
+                  );
+                },
               ),
-              const CircleAvatar(
-                radius: 100,
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              const Text(
-                'SEEKihod',
-                style: TextStyle(
-                  fontSize: 35,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const Text(
-                'Tourist Guide Mobile Application',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(
-                height: 25,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: TextFormField(
-                  cursorColor: myThemes.getIconColor(context),
-                  style: const TextStyle(fontSize: 20),
-                  controller: emailController,
-                  textInputAction: TextInputAction.next,
-                  decoration: textFieldDecoration('Email'),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (email) =>
-                      email != null && !EmailValidator.validate(email)
-                          ? 'Enter a valid email'
-                          : null,
-                ),
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: TextFormField(
-                  cursorColor: myThemes.getStylePrimaryColor(context),
-                  style: const TextStyle(fontSize: 20),
-                  controller: passwordController,
-                  textInputAction: TextInputAction.next,
-                  decoration: textFieldDecoration('Password'),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) => passwordController.text.isEmpty
-                      ? 'This Fields is required'
-                      : null,
-                ),
-              ),
-              const SizedBox(
-                height: 25,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 80),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    color: myThemes.getIconColor(context),
-                    child: TextButton(
-                      onPressed: signIn,
-                      child: Text(
-                        'Sign In',
-                        style: TextStyle(
-                            color: myThemes.getPrimaryColor(context),
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              const Text(
-                'Or',
-                style: TextStyle(
-                  fontSize: 15,
-                ),
-              ),
-              const Text(
-                'Sign in Using',
-                style: TextStyle(
-                  fontSize: 15,
-                ),
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                            color: myThemes.getIconColor(context), width: 2)),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {},
-                      icon: const Icon(
-                        EvaIcons.facebook,
-                        color: Colors.blue,
-                        size: 30,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        border: Border.all(
-                            color: myThemes.getIconColor(context), width: 2)),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {},
-                      icon: const Icon(
-                        EvaIcons.google,
-                        color: Colors.green,
-                        size: 30,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              RichText(
-                text: TextSpan(
-                  text: 'No account? ',
-                  style: TextStyle(
-                      color: myThemes.getFontNormal(context), fontSize: 12),
+            ),
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    TextSpan(
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = widget.onClickedSignUp,
-                      text: 'Sign Up',
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const CircleAvatar(
+                      radius: 100,
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const Text(
+                      'SEEKihod',
                       style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          color: myThemes.getIconColor(context)),
+                        fontSize: 35,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Text(
+                      'Tourist Guide Mobile Application',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: TextFormField(
+                        cursorColor: myThemes.getIconColor(context),
+                        style: const TextStyle(fontSize: 20),
+                        controller: emailController,
+                        textInputAction: TextInputAction.next,
+                        decoration: textFieldDecoration('Email'),
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (email) =>
+                            email != null && !EmailValidator.validate(email)
+                                ? 'Enter a valid email'
+                                : null,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: TextFormField(
+                        cursorColor: myThemes.getStylePrimaryColor(context),
+                        style: const TextStyle(fontSize: 20),
+                        controller: passwordController,
+                        textInputAction: TextInputAction.next,
+                        decoration: textFieldDecoration('Password'),
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (value) => passwordController.text.isEmpty
+                            ? 'This Fields is required'
+                            : null,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 80),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          color: myThemes.getIconColor(context),
+                          child: TextButton(
+                            onPressed: signIn,
+                            child: Text(
+                              'Sign In',
+                              style: TextStyle(
+                                  color: myThemes.getPrimaryColor(context),
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    const Text(
+                      'Or',
+                      style: TextStyle(
+                        fontSize: 15,
+                      ),
+                    ),
+                    const Text(
+                      'Sign in Using',
+                      style: TextStyle(
+                        fontSize: 15,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                  color: myThemes.getIconColor(context),
+                                  width: 2)),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {},
+                            icon: const Icon(
+                              EvaIcons.facebook,
+                              color: Colors.blue,
+                              size: 30,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              border: Border.all(
+                                  color: myThemes.getIconColor(context),
+                                  width: 2)),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              final provider =
+                                  Provider.of<GoogleSignInProvider>(context,
+                                      listen: false);
+
+                              provider.googleLogin();
+                            },
+                            icon: const Icon(
+                              EvaIcons.google,
+                              color: Colors.green,
+                              size: 30,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        text: 'No account? ',
+                        style: TextStyle(
+                            color: myThemes.getFontNormal(context),
+                            fontSize: 12),
+                        children: [
+                          TextSpan(
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = widget.onClickedSignUp,
+                            text: 'Sign Up',
+                            style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: myThemes.getIconColor(context)),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 50,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 50,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
+            ),
+          );
+        },
+      );
   Future signIn() async {
     final isValid = formKey.currentState!.validate();
     if (!isValid) return;
@@ -247,7 +259,15 @@ class _LoginWidgetState extends State<LoginWidget> {
         password: passwordController.text.trim(),
       );
 
-      Utils.showSnackBar('Log in Success. Welcome!', true);
+      Fluttertoast.showToast(
+        msg: "Log In Success!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.blue,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
 
       navigatorKey.currentState!.popUntil((route) => route.isCurrent);
     } on FirebaseAuthException catch (e) {

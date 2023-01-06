@@ -70,6 +70,7 @@ class DefaultFirebaseOptions {
     projectId: 'seekihod-tourist-guide',
     databaseURL: 'https://seekihod-tourist-guide-default-rtdb.firebaseio.com',
     storageBucket: 'seekihod-tourist-guide.appspot.com',
+    androidClientId: '101362972412-js727mi4kbmlsd09ll13uokim80tv253.apps.googleusercontent.com',
     iosClientId: '101362972412-je51nsqb9rs2lp9b7pld3b1n5ghk1dm9.apps.googleusercontent.com',
     iosBundleId: 'com.example.seekihod',
   );
@@ -81,6 +82,7 @@ class DefaultFirebaseOptions {
     projectId: 'seekihod-tourist-guide',
     databaseURL: 'https://seekihod-tourist-guide-default-rtdb.firebaseio.com',
     storageBucket: 'seekihod-tourist-guide.appspot.com',
+    androidClientId: '101362972412-js727mi4kbmlsd09ll13uokim80tv253.apps.googleusercontent.com',
     iosClientId: '101362972412-je51nsqb9rs2lp9b7pld3b1n5ghk1dm9.apps.googleusercontent.com',
     iosBundleId: 'com.example.seekihod',
   );

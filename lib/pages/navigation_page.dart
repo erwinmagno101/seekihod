@@ -8,7 +8,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:line_icons/line_icon.dart';
 import 'package:seekihod/UI/theme_provider.dart';
-import 'package:seekihod/copyrights_page.dart';
 import 'package:http/http.dart' as http;
 import "dart:convert" as convert;
 import 'dart:math';

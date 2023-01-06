@@ -7,6 +7,7 @@ import 'package:seekihod/main.dart';
 import 'package:seekihod/models/GlobalVar.dart';
 import 'package:seekihod/pages/AuthControl_page.dart';
 import 'package:seekihod/pages/dummy_page.dart';
+import 'package:seekihod/pages/verifyemail_page.dart';
 import 'package:seekihod/widget/loginWidget.dart';
 
 class AuthPage extends StatefulWidget {
@@ -29,7 +30,7 @@ class _AuthPageState extends State<AuthPage> {
             );
           } else if (snapshot.hasData) {
             globalVar.userLogged = true;
-            return DummyPage();
+            return VerifyEmailPage();
           } else {
             globalVar.userLogged = false;
             return AuthControlPage();

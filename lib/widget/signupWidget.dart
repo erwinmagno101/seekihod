@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_password_strength/flutter_password_strength.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:seekihod/models/GlobalVar.dart';
 import 'package:seekihod/views/main_view.dart';
 
@@ -41,7 +42,6 @@ class _SignUpWidgetState extends State<SignUpWidget> {
   String _message = "";
   bool hidePass = true;
   bool weakPass = false;
-  bool weakPassShow = false;
   Color _messageColor = Colors.red;
 
   PlatformFile? pickedFile;
@@ -77,10 +77,8 @@ class _SignUpWidgetState extends State<SignUpWidget> {
 
   @override
   Widget build(BuildContext context) {
-    double _strength;
-
     setState(() {
-      MainView();
+      const MainView();
     });
     return Scaffold(
       appBar: AppBar(
@@ -211,13 +209,11 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                       if (strength <= 1) {
                         _message = "Strong";
                         _messageColor = Colors.green;
-                        weakPassShow = false;
                         weakPass = false;
                       }
                       if (strength < .8) {
                         _message = "Moderate";
                         _messageColor = Colors.blue;
-                        weakPassShow = false;
                         weakPass = false;
                       }
                       if (strength < .5) {
@@ -340,15 +336,6 @@ class _SignUpWidgetState extends State<SignUpWidget> {
               const SizedBox(
                 height: 30,
               ),
-              if (weakPassShow)
-                const Text(
-                  "Need a Strong Password",
-                  style: TextStyle(color: Colors.red),
-                ),
-              if (weakPassShow)
-                const SizedBox(
-                  height: 30,
-                ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 80),
                 child: ClipRRect(
@@ -401,11 +388,28 @@ class _SignUpWidgetState extends State<SignUpWidget> {
 
   Future signUp() async {
     final isValid = formKey.currentState!.validate();
-    if (!isValid) return;
+    if (!isValid) {
+      Fluttertoast.showToast(
+        msg: "All Fields Required",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      return;
+    }
     if (weakPass) {
-      setState(() {
-        weakPassShow = true;
-      });
+      Fluttertoast.showToast(
+        msg: "Password Too Weak",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
       return;
     }
     showDialog(
@@ -437,7 +441,6 @@ class _SignUpWidgetState extends State<SignUpWidget> {
 
       globalVar.getImage();
 
-      Utils.showSnackBar('Sign Up Success. User Logged in', true);
       navigatorKey.currentState!.pop();
       navigatorKey.currentState!.popUntil((route) => route.isCurrent);
     } on FirebaseAuthException catch (e) {

@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:101362972412:android:0f065eb15f28d632938979",
+        "mobilesdk_app_id": "1:101362972412:android:844b91d9521c328a938979",
         "android_client_info": {
-          "package_name": "com.example.seekihod"
+          "package_name": "com.example.panel_seekihod"
         }
       },
       "oauth_client": [
@@ -32,10 +32,54 @@
               "client_type": 3
             },
             {
-              "client_id": "101362972412-je51nsqb9rs2lp9b7pld3b1n5ghk1dm9.apps.googleusercontent.com",
+              "client_id": "101362972412-1mgp7v091tdi6pe06rab6f7jajue3u6u.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.seekihod"
+                "bundle_id": "com.example.panelSeekihod"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:101362972412:android:0f065eb15f28d632938979",
+        "android_client_info": {
+          "package_name": "com.example.seekihod"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "101362972412-js727mi4kbmlsd09ll13uokim80tv253.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.seekihod",
+            "certificate_hash": "93fc58b8dbaedbc8e2c7e1dd26b2db1f5a2d5e4a"
+          }
+        },
+        {
+          "client_id": "101362972412-e3kknhd884979muqu6vg44o7rf7gukar.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJ_H95VTaSgF91Pdk5D6uHWzxtntoola0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "101362972412-e3kknhd884979muqu6vg44o7rf7gukar.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "101362972412-1mgp7v091tdi6pe06rab6f7jajue3u6u.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.panelSeekihod"
               }
             }
           ]
