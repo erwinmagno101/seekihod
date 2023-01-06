@@ -272,7 +272,15 @@ class _LoginWidgetState extends State<LoginWidget> {
       navigatorKey.currentState!.popUntil((route) => route.isCurrent);
     } on FirebaseAuthException catch (e) {
       print(e);
-      Utils.showSnackBar(e.message, false);
+      Fluttertoast.showToast(
+        msg: "${e.message}",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
 
     navigatorKey.currentState!.pop();

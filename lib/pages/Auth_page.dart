@@ -6,7 +6,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:seekihod/main.dart';
 import 'package:seekihod/models/GlobalVar.dart';
 import 'package:seekihod/pages/AuthControl_page.dart';
-import 'package:seekihod/pages/dummy_page.dart';
+import 'package:seekihod/pages/profile_page.dart';
 import 'package:seekihod/pages/verifyemail_page.dart';
 import 'package:seekihod/widget/loginWidget.dart';
 

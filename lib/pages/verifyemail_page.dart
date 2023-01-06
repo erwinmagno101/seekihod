@@ -9,7 +9,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:seekihod/UI/theme_provider.dart';
 import 'package:seekihod/models/utils.dart';
-import 'package:seekihod/pages/dummy_page.dart';
+import 'package:seekihod/pages/profile_page.dart';
 
 class VerifyEmailPage extends StatefulWidget {
   const VerifyEmailPage({super.key});
@@ -113,7 +113,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
 
   @override
   Widget build(BuildContext context) => isEmailVerified
-      ? DummyPage()
+      ? ProfilePage()
       : Scaffold(
           appBar: AppBar(
             centerTitle: true,
