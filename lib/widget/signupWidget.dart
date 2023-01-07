@@ -34,10 +34,10 @@ class _SignUpWidgetState extends State<SignUpWidget> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-  final firstNameController = TextEditingController();
+  final displayNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final userNameController = TextEditingController();
-  String urlDownload = "";
+  String photoUrlDownload = "";
   String _password = "";
   String _message = "";
   bool hidePass = true;
@@ -46,6 +46,8 @@ class _SignUpWidgetState extends State<SignUpWidget> {
 
   PlatformFile? pickedFile;
   UploadTask? uploadTask;
+
+  bool isCreate = false;
 
   Future selectFile() async {
     final result = await FilePicker.platform.pickFiles();
@@ -65,7 +67,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
     uploadTask = ref.putFile(file);
     final snapshot = await uploadTask!.whenComplete(() {});
     final urlDownload = await snapshot.ref.getDownloadURL();
-    print('Download link $urlDownload');
+    photoUrlDownload = urlDownload;
   }
 
   @override
@@ -283,38 +285,19 @@ class _SignUpWidgetState extends State<SignUpWidget> {
               const SizedBox(
                 height: 15,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width / 2 - 25,
-                    child: TextFormField(
-                      cursorColor: myThemes.getIconColor(context),
-                      style: const TextStyle(fontSize: 20),
-                      controller: firstNameController,
-                      textInputAction: TextInputAction.next,
-                      decoration: textFieldDecoration('First Name'),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) => firstNameController.text.isEmpty
-                          ? 'This Field is required'
-                          : null,
-                    ),
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width / 2 - 20,
-                    child: TextFormField(
-                      cursorColor: myThemes.getIconColor(context),
-                      style: const TextStyle(fontSize: 20),
-                      controller: lastNameController,
-                      textInputAction: TextInputAction.next,
-                      decoration: textFieldDecoration('Last Name'),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) => lastNameController.text.isEmpty
-                          ? 'This Field is required'
-                          : null,
-                    ),
-                  ),
-                ],
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: TextFormField(
+                  cursorColor: myThemes.getIconColor(context),
+                  style: const TextStyle(fontSize: 20),
+                  controller: displayNameController,
+                  textInputAction: TextInputAction.next,
+                  decoration: textFieldDecoration('Display Name'),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) => displayNameController.text.isEmpty
+                      ? 'This Field is required'
+                      : null,
+                ),
               ),
               const SizedBox(
                 height: 15,
@@ -420,33 +403,41 @@ class _SignUpWidgetState extends State<SignUpWidget> {
             ));
 
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      final email = emailController.text;
+      final displayName = displayNameController.text;
+      final userName = userNameController.text;
+      await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
-      );
-
-      final email = emailController.text;
-      final firstName = firstNameController.text;
-      final lastName = lastNameController.text;
-      final userName = userNameController.text;
+      )
+          .then((value) async {
+        var asd = value;
+        await value.user!.updateDisplayName(displayName);
+        uploadFile().then((value) async {
+          await asd.user!.updatePhotoURL(photoUrlDownload);
+        });
+      });
 
       createUser(
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
-        userName: userName,
-      );
-
-      uploadFile();
-
-      globalVar.getImage();
-
-      navigatorKey.currentState!.pop();
-      navigatorKey.currentState!.popUntil((route) => route.isCurrent);
+              email: email,
+              displayName: displayName,
+              userName: userName,
+              imgUrl: "photoUrlDownload")
+          .then((value) {
+        navigatorKey.currentState!.pop();
+        navigatorKey.currentState!.popUntil((route) => route.isCurrent);
+      });
     } on FirebaseAuthException catch (e) {
-      print(e);
-
-      Utils.showSnackBar(e.message, false);
+      Fluttertoast.showToast(
+        msg: e.message.toString(),
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
 
       navigatorKey.currentState!.pop();
     }
@@ -454,17 +445,17 @@ class _SignUpWidgetState extends State<SignUpWidget> {
 
   Future createUser({
     required String email,
-    required String firstName,
-    required String lastName,
+    required String displayName,
     required String userName,
+    required String imgUrl,
   }) async {
     final docUser = FirebaseFirestore.instance.collection('User').doc(email);
 
     final json = {
       'email': email,
-      'firstName': firstName,
-      'lastName': lastName,
+      'displayName': displayName,
       'userName': userName,
+      'imgUrl': imgUrl,
     };
 
     await docUser.set(json);

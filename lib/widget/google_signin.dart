@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -17,12 +18,19 @@ class GoogleSignInProvider extends ChangeNotifier {
 
     final googleAuth = await googleUser.authentication;
 
+    createUser(
+        email: googleUser.email,
+        displayName: googleUser.displayName.toString(),
+        userName: "",
+        imgUrl: googleUser.photoUrl.toString());
+
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
 
     await FirebaseAuth.instance.signInWithCredential(credential);
+
     Fluttertoast.showToast(
       msg: "Log In Success!",
       toastLength: Toast.LENGTH_SHORT,
@@ -38,5 +46,23 @@ class GoogleSignInProvider extends ChangeNotifier {
   Future logout() async {
     await googleSignIn.disconnect();
     FirebaseAuth.instance.signOut();
+  }
+
+  Future createUser({
+    required String email,
+    required String displayName,
+    required String userName,
+    required String imgUrl,
+  }) async {
+    final docUser = FirebaseFirestore.instance.collection('User').doc(email);
+
+    final json = {
+      'email': email,
+      'displayName': displayName,
+      'userName': userName,
+      'imgUrl': imgUrl,
+    };
+
+    await docUser.set(json);
   }
 }

@@ -23,6 +23,14 @@ class _ProfilePageState extends State<ProfilePage> {
       builder: (context, child) {
         final provider =
             Provider.of<GoogleSignInProvider>(context, listen: false);
+
+        final docUser = FirebaseFirestore.instance
+            .collection('User')
+            .doc(FirebaseAuth.instance.currentUser!.email.toString());
+
+        docUser.update(
+            {'imgUrl': FirebaseAuth.instance.currentUser!.photoURL.toString()});
+
         return Scaffold(
           appBar: AppBar(
             elevation: 0,
@@ -68,142 +76,81 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget profileDisplay(GoogleSignInProvider provider) {
-    for (UserInfo user in FirebaseAuth.instance.currentUser!.providerData) {
-      if (user.providerId.toString() == "google.com") {
-        User user = FirebaseAuth.instance.currentUser!;
-        return SingleChildScrollView(
-            child: Align(
-          alignment: Alignment.topCenter,
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height / 4,
-                child: Stack(
-                  fit: StackFit.loose,
-                  children: [
-                    Container(
-                      color: HexColor('#43B3AE'),
-                      height: MediaQuery.of(context).size.height / 5,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: Align(
-                        alignment: AlignmentDirectional.bottomEnd,
-                        child: CircleAvatar(
-                          radius: 90,
-                          backgroundImage: NetworkImage(
-                            user.photoURL.toString(),
-                          ),
-                        ),
+    User user = FirebaseAuth.instance.currentUser!;
+    return SingleChildScrollView(
+        child: Align(
+      alignment: Alignment.topCenter,
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height / 4,
+            child: Stack(
+              fit: StackFit.loose,
+              children: [
+                Container(
+                  color: HexColor('#43B3AE'),
+                  height: MediaQuery.of(context).size.height / 5,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: Align(
+                    alignment: AlignmentDirectional.bottomEnd,
+                    child: CircleAvatar(
+                      radius: 90,
+                      backgroundImage: NetworkImage(
+                        user.photoURL.toString(),
                       ),
                     ),
-                  ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Signed in as",
+                style: TextStyle(
+                  fontSize: 15,
+                  color: myThemes.getFontAllWhite(context),
                 ),
               ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Signed in as",
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: myThemes.getFontAllWhite(context),
-                    ),
-                  ),
-                  Text(
-                    "${user.displayName}",
-                    style: TextStyle(
-                        fontSize: 30,
-                        color: myThemes.getFontAllWhite(context),
-                        fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "${user.email}",
-                    style: TextStyle(
-                        fontSize: 20,
-                        color: myThemes.getFontAllWhite(context),
-                        fontWeight: FontWeight.bold),
-                  ),
-                ],
+              Text(
+                "${user.displayName}",
+                style: TextStyle(
+                    fontSize: 30,
+                    color: myThemes.getFontAllWhite(context),
+                    fontWeight: FontWeight.bold),
               ),
-              const SizedBox(
-                height: 15,
+              Text(
+                "${user.email}",
+                style: TextStyle(
+                    fontSize: 20,
+                    color: myThemes.getFontAllWhite(context),
+                    fontWeight: FontWeight.bold),
               ),
-              ElevatedButton.icon(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStatePropertyAll(HexColor('#43B3AE'))),
-                  onPressed: () {
-                    logout(provider);
-                  },
-                  icon: const Icon(
-                    EvaIcons.skipBack,
-                  ),
-                  label: const Text('Sign out'))
             ],
           ),
-        ));
-      }
-
-      if (user.providerId.toString() == "password") {
-        return FutureBuilder<UserModel?>(
-          future: readUser(
-              email: FirebaseAuth.instance.currentUser!.email.toString()),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              final User = snapshot.data!;
-
-              return Padding(
-                padding: const EdgeInsets.all(30),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      user.email!,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      User.firstName,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      User.lastName,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      User.userName,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    ElevatedButton.icon(
-                        onPressed: () {
-                          final provider = Provider.of<GoogleSignInProvider>(
-                              context,
-                              listen: false);
-                          logout(provider);
-                        },
-                        icon: Icon(EvaIcons.skipBack),
-                        label: Text('Log out'))
-                  ],
-                ),
-              );
-            } else if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else {
-              return Center(child: Text(snapshot.error.toString()));
-            }
-          },
-        );
-      }
-    }
-    return const Center(child: Text("No Data"));
+          const SizedBox(
+            height: 15,
+          ),
+          ElevatedButton.icon(
+              style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStatePropertyAll(HexColor('#43B3AE'))),
+              onPressed: () {
+                logout(provider);
+              },
+              icon: const Icon(
+                EvaIcons.skipBack,
+              ),
+              label: const Text('Sign out')),
+        ],
+      ),
+    ));
   }
 }

@@ -1,26 +1,24 @@
 // ignore: file_names
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:seekihod/views/main_view.dart';
 
 class UserModel {
-  String firstName;
-  String lastName;
+  String displayName;
   String userName;
+  String imgUrl;
 
   UserModel({
-    required this.firstName,
-    required this.lastName,
+    required this.displayName,
     required this.userName,
+    required this.imgUrl,
   });
 
-  Map<String, dynamic> toJson() => {
-        'firstName': firstName,
-        'lastName': lastName,
-        'userName': userName,
-      };
+  Map<String, dynamic> toJson() =>
+      {'displayName': displayName, 'userName': userName, 'imgUrl': imgUrl};
 
   static UserModel fromJson(Map<String, dynamic> json) => UserModel(
-        firstName: json['firstName'],
-        lastName: json['lastName'],
+        displayName: json['displayName'],
         userName: json['userName'],
+        imgUrl: json['imgUrl'],
       );
 }
