@@ -423,7 +423,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
               email: email,
               displayName: displayName,
               userName: userName,
-              imgUrl: "photoUrlDownload")
+              imgUrl: "")
           .then((value) {
         navigatorKey.currentState!.pop();
         navigatorKey.currentState!.popUntil((route) => route.isCurrent);

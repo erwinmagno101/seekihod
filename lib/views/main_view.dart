@@ -22,10 +22,6 @@ class MainView extends StatefulWidget {
 }
 
 final MyThemes myThemes = MyThemes();
-final user = FirebaseAuth.instance.currentUser!;
-
-var img;
-var userName;
 
 class _MainViewState extends State<MainView> {
   int index = 0;
@@ -44,45 +40,13 @@ class _MainViewState extends State<MainView> {
     const Text('Archive'),
   ];
 
-  getImage() async {
-    FirebaseStorage storage = FirebaseStorage.instance;
-
-    try {
-      Reference ref = storage
-          .ref()
-          .child('User_images/${FirebaseAuth.instance.currentUser!.email}.jpg');
-      String imageUrl = await ref.getDownloadURL();
-      img = imageUrl;
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  readUser() async {
-    try {
-      final docUser = FirebaseFirestore.instance
-          .collection('User')
-          .doc(FirebaseAuth.instance.currentUser!.email.toString());
-
-      final snapshot = await docUser.get();
-
-      if (snapshot.exists) {
-        userName = snapshot.data()!;
-      }
-      return null;
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Widget avatar(double rad) {
+  Widget avatar(double rad, User user) {
     try {
       return CircleAvatar(
         radius: rad,
-        backgroundImage: NetworkImage(img),
+        backgroundImage: NetworkImage(user.photoURL.toString()),
       );
     } catch (e) {
-      print(e);
       return CircleAvatar(
         radius: rad,
         backgroundImage: const AssetImage('lib/assets/images/emptyProfile.jpg'),
@@ -90,10 +54,10 @@ class _MainViewState extends State<MainView> {
     }
   }
 
-  Widget avatarName() {
+  Widget avatarName(User user) {
     try {
       return Text(
-        '${userName["firstName"]} ${userName["lastName"]}',
+        '${user.displayName}',
         style:
             TextStyle(fontSize: 28, color: myThemes.getFontAllWhite(context)),
       );
@@ -108,12 +72,12 @@ class _MainViewState extends State<MainView> {
 
   @override
   Widget build(BuildContext context) {
-    readUser();
-    getImage();
+    User user = FirebaseAuth.instance.currentUser!;
+
     return Scaffold(
       drawer: NavigationDrawer(
-        avatar: avatar(80),
-        avatarName: avatarName(),
+        avatar: avatar(80, user),
+        avatarName: avatarName(user),
       ),
       appBar: AppBar(
         actions: [
@@ -122,10 +86,6 @@ class _MainViewState extends State<MainView> {
             child: InkWell(
               overlayColor: MaterialStateProperty.all(const Color(0x00000000)),
               onTap: () {
-                setState(() {
-                  readUser();
-                  getImage();
-                });
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => const AuthPage()));
               },
@@ -133,16 +93,7 @@ class _MainViewState extends State<MainView> {
                 stream: FirebaseAuth.instance.authStateChanges(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    getImage();
-                    readUser();
-
-                    return avatar(15);
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const CircleAvatar(
-                      radius: 15,
-                      child: CircularProgressIndicator(),
-                    );
+                    return avatar(15, user);
                   } else {
                     return const CircleAvatar(
                       radius: 15,

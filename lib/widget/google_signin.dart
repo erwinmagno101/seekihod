@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:seekihod/models/UserModel.dart';
 
 class GoogleSignInProvider extends ChangeNotifier {
   final googleSignIn = GoogleSignIn();
@@ -18,11 +19,18 @@ class GoogleSignInProvider extends ChangeNotifier {
 
     final googleAuth = await googleUser.authentication;
 
-    createUser(
-        email: googleUser.email,
-        displayName: googleUser.displayName.toString(),
-        userName: "",
-        imgUrl: googleUser.photoUrl.toString());
+    final docUser =
+        FirebaseFirestore.instance.collection('User').doc(googleUser.email);
+
+    final snapshot = await docUser.get();
+
+    if (!snapshot.exists) {
+      createUser(
+          email: googleUser.email,
+          displayName: googleUser.displayName.toString(),
+          userName: "",
+          imgUrl: googleUser.photoUrl.toString());
+    }
 
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,

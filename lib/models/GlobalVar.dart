@@ -8,18 +8,4 @@ class globalVar {
   static var gg;
   static var ref;
   static SpotModel? featureModel;
-
-  static getImage() async {
-    FirebaseStorage storage = FirebaseStorage.instance;
-
-    try {
-      Reference ref = storage
-          .ref()
-          .child('User_images/${FirebaseAuth.instance.currentUser!.email}.jpg');
-      String imageUrl = await ref.getDownloadURL();
-      img = imageUrl;
-    } catch (e) {
-      print(e);
-    }
-  }
 }

@@ -16,6 +16,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  String? userName;
   final user = FirebaseAuth.instance.currentUser!;
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider(
@@ -31,25 +32,36 @@ class _ProfilePageState extends State<ProfilePage> {
         docUser.update(
             {'imgUrl': FirebaseAuth.instance.currentUser!.photoURL.toString()});
 
-        return Scaffold(
-          appBar: AppBar(
-            elevation: 0,
-            centerTitle: true,
-            title: const Text('Profile Page'),
-            leading: BackButton(
-              onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          const MainView()), // this mymainpage is your page to refresh
-                  (Route<dynamic> route) => false,
+        return FutureBuilder<UserModel?>(
+            future: readUser(
+                email: FirebaseAuth.instance.currentUser!.email.toString()),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                final user = snapshot.data!;
+                userName = user.userName;
+                return Scaffold(
+                  appBar: AppBar(
+                    elevation: 0,
+                    centerTitle: true,
+                    title: const Text('Profile Page'),
+                    leading: BackButton(
+                      onPressed: () {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const MainView()), // this mymainpage is your page to refresh
+                          (Route<dynamic> route) => false,
+                        );
+                      },
+                    ),
+                  ),
+                  body: profileDisplay(provider),
                 );
-              },
-            ),
-          ),
-          body: profileDisplay(provider),
-        );
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            });
       });
 
   Future<UserModel?> readUser({required String email}) async {
@@ -78,79 +90,219 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget profileDisplay(GoogleSignInProvider provider) {
     User user = FirebaseAuth.instance.currentUser!;
     return SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 20),
         child: Align(
-      alignment: Alignment.topCenter,
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height / 4,
-            child: Stack(
-              fit: StackFit.loose,
-              children: [
-                Container(
-                  color: HexColor('#43B3AE'),
-                  height: MediaQuery.of(context).size.height / 5,
+          alignment: Alignment.topCenter,
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height / 4,
+                child: Stack(
+                  fit: StackFit.loose,
+                  children: [
+                    Container(
+                      color: HexColor('#43B3AE'),
+                      height: MediaQuery.of(context).size.height / 5,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: Align(
+                        alignment: AlignmentDirectional.bottomCenter,
+                        child: CircleAvatar(
+                          radius: 90,
+                          backgroundImage: NetworkImage(
+                            user.photoURL.toString(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: Align(
-                    alignment: AlignmentDirectional.bottomEnd,
-                    child: CircleAvatar(
-                      radius: 90,
-                      backgroundImage: NetworkImage(
-                        user.photoURL.toString(),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Signed in as",
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: myThemes.getFontAllWhite(context),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 10),
+                      child: Text(
+                        "Display Name",
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: myThemes.getFontAllWhite(context),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Signed in as",
-                style: TextStyle(
-                  fontSize: 15,
-                  color: myThemes.getFontAllWhite(context),
-                ),
+                  Card(
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Expanded(
+                            flex: 0,
+                            child: Icon(
+                              Icons.person,
+                              size: 30,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 25),
+                              child: Text(
+                                "${user.displayName}",
+                                style: TextStyle(
+                                    fontSize: 25,
+                                    color: myThemes.getFontAllWhite(context),
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 10),
+                      child: Text(
+                        "Email Address",
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: myThemes.getFontAllWhite(context),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Card(
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Expanded(
+                            flex: 0,
+                            child: Icon(
+                              Icons.email,
+                              size: 30,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 25),
+                              child: Text(
+                                "${user.email}",
+                                maxLines: 2,
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  color: myThemes.getFontAllWhite(context),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 10),
+                      child: Text(
+                        "Username",
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: myThemes.getFontAllWhite(context),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Card(
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Expanded(
+                            flex: 0,
+                            child: Icon(
+                              Icons.person_pin,
+                              size: 30,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 25),
+                              child: Text(
+                                userName!,
+                                maxLines: 2,
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  color: myThemes.getFontAllWhite(context),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                "${user.displayName}",
-                style: TextStyle(
-                    fontSize: 30,
-                    color: myThemes.getFontAllWhite(context),
-                    fontWeight: FontWeight.bold),
+              const SizedBox(
+                height: 15,
               ),
-              Text(
-                "${user.email}",
-                style: TextStyle(
-                    fontSize: 20,
-                    color: myThemes.getFontAllWhite(context),
-                    fontWeight: FontWeight.bold),
-              ),
+              ElevatedButton.icon(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStatePropertyAll(HexColor('#43B3AE'))),
+                  onPressed: () {
+                    logout(provider);
+                  },
+                  icon: const Icon(
+                    EvaIcons.skipBack,
+                  ),
+                  label: const Text('Sign out')),
             ],
           ),
-          const SizedBox(
-            height: 15,
-          ),
-          ElevatedButton.icon(
-              style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStatePropertyAll(HexColor('#43B3AE'))),
-              onPressed: () {
-                logout(provider);
-              },
-              icon: const Icon(
-                EvaIcons.skipBack,
-              ),
-              label: const Text('Sign out')),
-        ],
-      ),
-    ));
+        ));
   }
 }
