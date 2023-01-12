@@ -24,6 +24,14 @@ class _CategoryPageState extends State<CategoryPage> {
       appBar: AppBar(
         elevation: 0,
         title: Text(widget.type),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        leading: BackButton(
+          color: myThemes.getIconColor(context),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
       ),
       body: ListView.builder(
         itemCount: widget.currentModel.length,

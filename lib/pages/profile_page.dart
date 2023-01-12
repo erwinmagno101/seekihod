@@ -45,6 +45,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     centerTitle: true,
                     title: const Text('Profile Page'),
                     leading: BackButton(
+                      color: myThemes.getIconColor(context),
                       onPressed: () {
                         Navigator.pushAndRemoveUntil(
                           context,
@@ -130,17 +131,16 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Text(
+                  const Text(
                     "Signed in as",
                     style: TextStyle(
                       fontSize: 15,
-                      color: myThemes.getFontAllWhite(context),
                     ),
                   ),
                   const SizedBox(
                     height: 10,
                   ),
-                  Align(
+                  const Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
                       padding: EdgeInsets.only(left: 10),
@@ -148,7 +148,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         "Display Name",
                         style: TextStyle(
                           fontSize: 15,
-                          color: myThemes.getFontAllWhite(context),
                         ),
                       ),
                     ),
@@ -174,10 +173,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               padding: const EdgeInsets.only(left: 25),
                               child: Text(
                                 "${user.displayName}",
-                                style: TextStyle(
-                                    fontSize: 25,
-                                    color: myThemes.getFontAllWhite(context),
-                                    fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    fontSize: 25, fontWeight: FontWeight.bold),
                               ),
                             ),
                           ),
@@ -188,7 +185,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Align(
+                  const Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
                       padding: EdgeInsets.only(left: 10),
@@ -196,7 +193,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         "Email Address",
                         style: TextStyle(
                           fontSize: 15,
-                          color: myThemes.getFontAllWhite(context),
                         ),
                       ),
                     ),
@@ -219,13 +215,12 @@ class _ProfilePageState extends State<ProfilePage> {
                           Expanded(
                             flex: 1,
                             child: Padding(
-                              padding: EdgeInsets.only(left: 25),
+                              padding: const EdgeInsets.only(left: 25),
                               child: Text(
                                 "${user.email}",
                                 maxLines: 2,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 25,
-                                  color: myThemes.getFontAllWhite(context),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -238,7 +233,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Align(
+                  const Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
                       padding: EdgeInsets.only(left: 10),
@@ -246,7 +241,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         "Username",
                         style: TextStyle(
                           fontSize: 15,
-                          color: myThemes.getFontAllWhite(context),
                         ),
                       ),
                     ),
@@ -273,9 +267,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               child: Text(
                                 userName!,
                                 maxLines: 2,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 25,
-                                  color: myThemes.getFontAllWhite(context),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -295,7 +288,95 @@ class _ProfilePageState extends State<ProfilePage> {
                       backgroundColor:
                           MaterialStatePropertyAll(HexColor('#43B3AE'))),
                   onPressed: () {
-                    logout(provider);
+                    showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (BuildContext context) {
+                          return StatefulBuilder(builder: (contex, setState) {
+                            return Dialog(
+                                backgroundColor: Colors.transparent,
+                                child: Card(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 30, vertical: 30),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Text(
+                                          "Are you sure you want to sign out?",
+                                          maxLines: 3,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 30,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 50,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              child: Container(
+                                                color: myThemes
+                                                    .getIconColor(context),
+                                                width: 100,
+                                                child: TextButton(
+                                                  child: Text(
+                                                    "Sign out",
+                                                    style: TextStyle(
+                                                        color: myThemes
+                                                            .getPrimaryColor(
+                                                                context),
+                                                        fontSize: 25,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  onPressed: () {
+                                                    logout(provider);
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              child: Container(
+                                                color: myThemes
+                                                    .getIconColor(context),
+                                                width: 100,
+                                                child: TextButton(
+                                                  child: Text(
+                                                    "Cancel",
+                                                    style: TextStyle(
+                                                        color: myThemes
+                                                            .getPrimaryColor(
+                                                                context),
+                                                        fontSize: 25,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ));
+                          });
+                        });
                   },
                   icon: const Icon(
                     EvaIcons.skipBack,

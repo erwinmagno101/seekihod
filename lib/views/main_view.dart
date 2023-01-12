@@ -69,94 +69,181 @@ class _MainViewState extends State<MainView> {
     }
   }
 
+  Future<bool> _onWillPop() async {
+    return (await showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (BuildContext context) {
+              return StatefulBuilder(builder: (contex, setState) {
+                return Dialog(
+                    backgroundColor: Colors.transparent,
+                    child: Card(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 30),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              "You sure you want to exit?",
+                              maxLines: 3,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 50,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(15),
+                                  child: Container(
+                                    color: myThemes.getIconColor(context),
+                                    width: 100,
+                                    child: TextButton(
+                                      child: Text(
+                                        "Confirm",
+                                        style: TextStyle(
+                                            color: myThemes
+                                                .getPrimaryColor(context),
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop(true);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(15),
+                                  child: Container(
+                                    color: myThemes.getIconColor(context),
+                                    width: 100,
+                                    child: TextButton(
+                                      child: Text(
+                                        "Cancel",
+                                        style: TextStyle(
+                                            color: myThemes
+                                                .getPrimaryColor(context),
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop(false);
+                                      },
+                                    ),
+                                  ),
+                                )
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    ));
+              });
+            })) ??
+        false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: NavigationDrawer(),
-      appBar: AppBar(
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 15),
-            child: InkWell(
-              overlayColor: MaterialStateProperty.all(const Color(0x00000000)),
-              onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const AuthPage()));
-              },
-              child: StreamBuilder<User?>(
-                stream: FirebaseAuth.instance.authStateChanges(),
-                builder: (context, snapshot) {
-                  final user = FirebaseAuth.instance.currentUser;
-                  if (snapshot.hasData) {
-                    return CircleAvatar(
-                      radius: 15,
-                      backgroundImage: NetworkImage(user!.photoURL.toString()),
-                    );
-                  } else {
-                    return const CircleAvatar(
-                      radius: 15,
-                      backgroundImage:
-                          AssetImage('lib/assets/images/emptyProfile.jpg'),
-                    );
-                  }
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        drawer: NavigationDrawer(),
+        appBar: AppBar(
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 15),
+              child: InkWell(
+                overlayColor:
+                    MaterialStateProperty.all(const Color(0x00000000)),
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const AuthPage()));
                 },
+                child: StreamBuilder<User?>(
+                  stream: FirebaseAuth.instance.authStateChanges(),
+                  builder: (context, snapshot) {
+                    final user = FirebaseAuth.instance.currentUser;
+                    if (snapshot.hasData) {
+                      return CircleAvatar(
+                        radius: 15,
+                        backgroundImage:
+                            NetworkImage(user!.photoURL.toString()),
+                      );
+                    } else {
+                      return const CircleAvatar(
+                        radius: 15,
+                        backgroundImage:
+                            AssetImage('lib/assets/images/emptyProfile.jpg'),
+                      );
+                    }
+                  },
+                ),
               ),
+            )
+          ],
+          iconTheme: IconThemeData(color: myThemes.getIconColor(context)),
+          centerTitle: true,
+          elevation: 0,
+          title: title[index],
+        ),
+        body: screens[index],
+        bottomNavigationBar: NavigationBar(
+          onDestinationSelected: (index) => setState(() => this.index = index),
+          selectedIndex: index,
+          height: 50,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(
+                EvaIcons.homeOutline,
+              ),
+              selectedIcon: Icon(
+                EvaIcons.home,
+                color: myThemes.getIconColor(context),
+              ),
+              label: 'Home',
             ),
-          )
-        ],
-        iconTheme: IconThemeData(color: myThemes.getIconColor(context)),
-        centerTitle: true,
-        elevation: 0,
-        title: title[index],
-      ),
-      body: screens[index],
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (index) => setState(() => this.index = index),
-        selectedIndex: index,
-        height: 50,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(
-              EvaIcons.homeOutline,
+            NavigationDestination(
+              icon: const Icon(
+                EvaIcons.starOutline,
+              ),
+              selectedIcon: Icon(
+                EvaIcons.star,
+                color: myThemes.getIconColor(context),
+              ),
+              label: 'Featured',
             ),
-            selectedIcon: Icon(
-              EvaIcons.home,
-              color: myThemes.getIconColor(context),
+            NavigationDestination(
+              icon: const Icon(
+                EvaIcons.calendarOutline,
+              ),
+              selectedIcon: Icon(
+                EvaIcons.calendar,
+                color: myThemes.getIconColor(context),
+              ),
+              label: 'Events',
             ),
-            label: 'Home',
-          ),
-          NavigationDestination(
-            icon: const Icon(
-              EvaIcons.starOutline,
+            NavigationDestination(
+              icon: const Icon(
+                EvaIcons.bookOpenOutline,
+              ),
+              selectedIcon: Icon(
+                EvaIcons.bookOpen,
+                color: myThemes.getIconColor(context),
+              ),
+              label: 'Archive',
             ),
-            selectedIcon: Icon(
-              EvaIcons.star,
-              color: myThemes.getIconColor(context),
-            ),
-            label: 'Featured',
-          ),
-          NavigationDestination(
-            icon: const Icon(
-              EvaIcons.calendarOutline,
-            ),
-            selectedIcon: Icon(
-              EvaIcons.calendar,
-              color: myThemes.getIconColor(context),
-            ),
-            label: 'Events',
-          ),
-          NavigationDestination(
-            icon: const Icon(
-              EvaIcons.bookOpenOutline,
-            ),
-            selectedIcon: Icon(
-              EvaIcons.bookOpen,
-              color: myThemes.getIconColor(context),
-            ),
-            label: 'Archive',
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

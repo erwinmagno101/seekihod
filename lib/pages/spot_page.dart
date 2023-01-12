@@ -492,6 +492,12 @@ class _SpotPageState extends State<SpotPage> {
                                               onPressed: () {
                                                 addRating(currentModel, user,
                                                     starRating);
+                                                Fluttertoast.showToast(
+                                                  backgroundColor: Colors.blue,
+                                                  toastLength:
+                                                      Toast.LENGTH_SHORT,
+                                                  msg: "Rated successfully",
+                                                );
                                               },
                                               child: Text(
                                                 'Rate',
@@ -528,6 +534,13 @@ class _SpotPageState extends State<SpotPage> {
                                                   onPressed: () {
                                                     updateRating(currentModel,
                                                         user, updateStar);
+                                                    Fluttertoast.showToast(
+                                                      backgroundColor:
+                                                          Colors.blue,
+                                                      toastLength:
+                                                          Toast.LENGTH_SHORT,
+                                                      msg: "Rating Updated",
+                                                    );
                                                     setState(() {
                                                       showRating = false;
                                                     });
@@ -734,6 +747,25 @@ class _SpotPageState extends State<SpotPage> {
                                                         user,
                                                         commentEditingController
                                                             .text);
+
+                                                    if (hasComment) {
+                                                      Fluttertoast.showToast(
+                                                        backgroundColor:
+                                                            Colors.blue,
+                                                        toastLength:
+                                                            Toast.LENGTH_SHORT,
+                                                        msg: "Comment Updated",
+                                                      );
+                                                    } else {
+                                                      Fluttertoast.showToast(
+                                                        backgroundColor:
+                                                            Colors.blue,
+                                                        toastLength:
+                                                            Toast.LENGTH_SHORT,
+                                                        msg:
+                                                            "Successfully Commented",
+                                                      );
+                                                    }
 
                                                     setState(() {
                                                       userExistComment =
@@ -1442,6 +1474,9 @@ class _SpotPageState extends State<SpotPage> {
                                                                             ),
                                                                             onPressed:
                                                                                 () {
+                                                                              Navigator.of(context).pop();
+                                                                              Navigator.of(context).pop();
+
                                                                               Navigator.of(context).push(MaterialPageRoute(builder: (context) => const AuthPage()));
                                                                             },
                                                                           ),

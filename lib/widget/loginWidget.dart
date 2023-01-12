@@ -25,6 +25,8 @@ class LoginWidget extends StatefulWidget {
 }
 
 class _LoginWidgetState extends State<LoginWidget> {
+  bool hidePass = true;
+
   final MyThemes myThemes = MyThemes();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -71,6 +73,9 @@ class _LoginWidgetState extends State<LoginWidget> {
                     ),
                     const CircleAvatar(
                       radius: 100,
+                      backgroundColor: Colors.transparent,
+                      backgroundImage:
+                          AssetImage('lib/assets/images/seekihod.png'),
                     ),
                     const SizedBox(
                       height: 10,
@@ -113,16 +118,43 @@ class _LoginWidgetState extends State<LoginWidget> {
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 40),
-                      child: TextFormField(
-                        cursorColor: myThemes.getStylePrimaryColor(context),
-                        style: const TextStyle(fontSize: 20),
-                        controller: passwordController,
-                        textInputAction: TextInputAction.next,
-                        decoration: textFieldDecoration('Password'),
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        validator: (value) => passwordController.text.isEmpty
-                            ? 'This Fields is required'
-                            : null,
+                      child: Stack(
+                        children: [
+                          TextFormField(
+                            obscureText: hidePass,
+                            cursorColor: myThemes.getStylePrimaryColor(context),
+                            style: const TextStyle(fontSize: 20),
+                            controller: passwordController,
+                            textInputAction: TextInputAction.next,
+                            decoration: textFieldDecoration('Password'),
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            validator: (value) =>
+                                passwordController.text.isEmpty
+                                    ? 'This Fields is required'
+                                    : null,
+                          ),
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 10),
+                              child: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    if (hidePass == true) {
+                                      hidePass = false;
+                                      return;
+                                    }
+                                    hidePass = true;
+                                  });
+                                },
+                                icon: hidePass
+                                    ? Icon(EvaIcons.eyeOff2)
+                                    : Icon(EvaIcons.eye),
+                              ),
+                            ),
+                          )
+                        ],
                       ),
                     ),
                     const SizedBox(
