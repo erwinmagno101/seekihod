@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:seekihod/UI/theme_provider.dart';
-import 'package:seekihod/models/GlobalVar.dart';
 import 'package:seekihod/pages/Auth_page.dart';
 import 'package:seekihod/views/archive_view.dart';
 import 'package:seekihod/views/events_view.dart';
@@ -72,13 +70,8 @@ class _MainViewState extends State<MainView> {
 
   @override
   Widget build(BuildContext context) {
-    User user = FirebaseAuth.instance.currentUser!;
-
     return Scaffold(
-      drawer: NavigationDrawer(
-        avatar: avatar(80, user),
-        avatarName: avatarName(user),
-      ),
+      drawer: NavigationDrawer(),
       appBar: AppBar(
         actions: [
           Padding(
@@ -92,8 +85,12 @@ class _MainViewState extends State<MainView> {
               child: StreamBuilder<User?>(
                 stream: FirebaseAuth.instance.authStateChanges(),
                 builder: (context, snapshot) {
+                  final user = FirebaseAuth.instance.currentUser;
                   if (snapshot.hasData) {
-                    return avatar(15, user);
+                    return CircleAvatar(
+                      radius: 15,
+                      backgroundImage: NetworkImage(user!.photoURL.toString()),
+                    );
                   } else {
                     return const CircleAvatar(
                       radius: 15,
@@ -165,12 +162,9 @@ class _MainViewState extends State<MainView> {
 }
 
 class NavigationDrawer extends StatefulWidget {
-  final Widget avatar;
-  final Widget avatarName;
-
-  const NavigationDrawer(
-      {Key? key, required this.avatar, required this.avatarName})
-      : super(key: key);
+  const NavigationDrawer({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<NavigationDrawer> createState() => _NavigationDrawerState();
@@ -197,6 +191,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
+          final user = FirebaseAuth.instance.currentUser!;
           return Material(
             color: myThemes.getIconColorDark(context),
             child: InkWell(
@@ -213,11 +208,19 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     const SizedBox(
                       height: 25,
                     ),
-                    widget.avatar,
+                    CircleAvatar(
+                      radius: 80,
+                      backgroundImage: NetworkImage(user.photoURL.toString()),
+                    ),
                     const SizedBox(
                       height: 12,
                     ),
-                    widget.avatarName,
+                    Text(
+                      '${user.displayName}',
+                      style: TextStyle(
+                          fontSize: 28,
+                          color: myThemes.getFontAllWhite(context)),
+                    ),
                     Text(
                       FirebaseAuth.instance.currentUser!.email.toString(),
                       style: TextStyle(
