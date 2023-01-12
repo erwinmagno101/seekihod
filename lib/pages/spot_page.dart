@@ -21,6 +21,8 @@ class SpotPage extends StatefulWidget {
 
 class _SpotPageState extends State<SpotPage> {
   List<String> urlImages = [];
+  double reviewAverage = 0;
+  List<dynamic> reviews = [];
 
   int activeIndex = 0;
   bool show = false;
@@ -29,6 +31,12 @@ class _SpotPageState extends State<SpotPage> {
     if (urlImages.isEmpty) {
       urlImages = widget.spotModel.images.cast<String>();
     }
+    reviews = widget.spotModel.review.values.toList();
+    for (int i = 0; i < reviews.length; i++) {
+      reviewAverage += double.parse(reviews[i]);
+    }
+    reviewAverage = reviewAverage / reviews.length;
+    print(reviewAverage);
 
     return makeDismissable(
       context: context,
@@ -169,7 +177,7 @@ class _SpotPageState extends State<SpotPage> {
                                               MainAxisAlignment.center,
                                           children: [
                                             Text(
-                                              '4.8',
+                                              reviewAverage.toString(),
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: myThemes
@@ -191,7 +199,7 @@ class _SpotPageState extends State<SpotPage> {
                                           height: 10,
                                         ),
                                         Text(
-                                          '1k Reviews',
+                                          "${reviews.length.toString()} reviews",
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: myThemes

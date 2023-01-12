@@ -8,6 +8,7 @@ import 'package:seekihod/views/archive_view.dart';
 import 'package:seekihod/views/events_view.dart';
 import 'package:seekihod/views/feature_view.dart';
 import 'package:seekihod/views/home_view.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/UserModel.dart';
 import '../widget/change_theme_button_widget.dart';
@@ -296,9 +297,23 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
             const ListTile(
               title: Text('DOT Siquijor'),
             ),
-            const ListTile(
-              leading: Icon(EvaIcons.heart),
-              title: Text('Health Protocols'),
+            ListTile(
+              leading: const Icon(EvaIcons.heart),
+              title: const Text('Health Protocols'),
+              onTap: () async {
+                final url = Uri.parse(
+                    "https://dumaguete.com/traveling-to-siquijor-requirements-restrictions-202/");
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(
+                    url,
+                    webViewConfiguration:
+                        const WebViewConfiguration(enableJavaScript: true),
+                    mode: LaunchMode.externalApplication,
+                  );
+                } else {
+                  throw 'Could not launch $url';
+                }
+              },
             ),
             const ListTile(
               leading: Icon(EvaIcons.questionMarkCircle),
