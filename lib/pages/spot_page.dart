@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -12,6 +13,8 @@ import 'package:seekihod/pages/navigation_page.dart';
 import 'package:seekihod/views/main_view.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import 'Auth_page.dart';
+
 class SpotPage extends StatefulWidget {
   final SpotModel spotModel;
   const SpotPage({Key? key, required this.spotModel}) : super(key: key);
@@ -22,16 +25,21 @@ class SpotPage extends StatefulWidget {
 
 class _SpotPageState extends State<SpotPage> {
   List<String> urlImages = [];
-
+  int starRating = 0;
+  int updateStar = 0;
   int activeIndex = 0;
   bool show = false;
+  bool showRating = false;
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<SpotModel>(
         stream: readSpots(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            User? user = FirebaseAuth.instance.currentUser;
+
             SpotModel currentModel = snapshot.data!;
+
             if (urlImages.isEmpty) {
               urlImages = currentModel.images.cast<String>();
             }
@@ -47,267 +55,257 @@ class _SpotPageState extends State<SpotPage> {
             } else {
               reviewAverage = 0;
             }
-
-            return makeDismissable(
-              context: context,
-              child: DraggableScrollableSheet(
-                initialChildSize: .7,
-                maxChildSize: .9,
-                minChildSize: .6,
-                builder: (_, controller) => Scaffold(
-                  backgroundColor: Colors.transparent,
-                  floatingActionButton:
-                      buildNavigateButton(context, currentModel),
-                  body: Container(
-                    decoration: BoxDecoration(
-                      color: myThemes.getPrimaryColor(context),
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(20),
+            if (user != null) {
+              if (currentModel.review.containsKey(user.email)) {
+                starRating = int.parse(currentModel.review[user.email]);
+              }
+              return makeDismissable(
+                context: context,
+                child: DraggableScrollableSheet(
+                  initialChildSize: .7,
+                  maxChildSize: .9,
+                  minChildSize: .6,
+                  builder: (_, controller) => Scaffold(
+                    backgroundColor: Colors.transparent,
+                    floatingActionButton:
+                        buildNavigateButton(context, currentModel),
+                    body: Container(
+                      decoration: BoxDecoration(
+                        color: myThemes.getPrimaryColor(context),
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(20),
+                        ),
                       ),
-                    ),
-                    child: SingleChildScrollView(
-                      controller: controller,
-                      child: Column(
-                        children: <Widget>[
-                          const Icon(
-                            Icons.drag_handle,
-                            size: 30,
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: myThemes.getPrimaryColor(context),
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(.2),
-                                  spreadRadius: .1,
-                                  blurRadius: .1,
-                                )
-                              ],
+                      child: SingleChildScrollView(
+                        controller: controller,
+                        child: Column(
+                          children: <Widget>[
+                            const Icon(
+                              Icons.drag_handle,
+                              size: 30,
                             ),
-                            height: 250,
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                Image.network(
-                                  currentModel.imgUrl,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (BuildContext context,
-                                      Object exception,
-                                      StackTrace? stackTrace) {
-                                    return Center(
-                                        child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: const [
-                                        Icon(Icons.error_outline),
-                                        Text("Failed to load Images"),
-                                      ],
-                                    ));
-                                  },
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Colors.transparent,
-                                        Colors.black.withOpacity(1),
-                                      ],
-                                    ),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: myThemes.getPrimaryColor(context),
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(.2),
+                                    spreadRadius: .1,
+                                    blurRadius: .1,
+                                  )
+                                ],
+                              ),
+                              height: 250,
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  Image.network(
+                                    currentModel.imgUrl,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (BuildContext context,
+                                        Object exception,
+                                        StackTrace? stackTrace) {
+                                      return Center(
+                                          child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: const [
+                                          Icon(Icons.error_outline),
+                                          Text("Failed to load Images"),
+                                        ],
+                                      ));
+                                    },
                                   ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15, vertical: 15),
-                                  child: Align(
-                                    alignment: AlignmentDirectional.bottomStart,
-                                    child: Container(
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            flex: 3,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Text(
-                                                  currentModel.name,
-                                                  maxLines: 3,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                      color: myThemes
-                                                          .getFontAllWhite(
-                                                              context),
-                                                      fontSize: 25,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons.pin_drop,
-                                                      size: 15,
-                                                      color:
-                                                          myThemes.getIconColor(
-                                                              context),
-                                                    ),
-                                                    Text(
-                                                      currentModel.address,
-                                                      maxLines: 2,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                        color: myThemes
-                                                            .getFontAllWhite(
-                                                                context),
-                                                        fontSize: 15,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Text(
-                                                  currentModel.type
-                                                      .toUpperCase(),
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: myThemes
-                                                        .getFontAllWhite(
-                                                            context),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          const Spacer(
-                                            flex: 1,
-                                          ),
-                                          Expanded(
-                                            flex: 1,
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Text(
-                                                      reviewAverage.toString(),
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                        color: myThemes
-                                                            .getFontAllWhite(
-                                                                context),
-                                                      ),
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 5,
-                                                    ),
-                                                    Icon(
-                                                      EvaIcons.star,
-                                                      size: 15,
-                                                      color:
-                                                          myThemes.getIconColor(
-                                                              context),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                                Text(
-                                                  "${reviewCount} reviews",
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: myThemes
-                                                        .getFontAllWhite(
-                                                            context),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.transparent,
+                                          Colors.black.withOpacity(1),
                                         ],
                                       ),
                                     ),
                                   ),
-                                )
-                              ],
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 25),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'About this Tourist Spot',
-                                  style: TextStyle(fontSize: 20),
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      if (show == false) {
-                                        show = true;
-                                        return;
-                                      }
-                                      show = false;
-                                    });
-                                  },
-                                  icon: show
-                                      ? const Icon(
-                                          EvaIcons.arrowIosUpward,
-                                          size: 25,
-                                        )
-                                      : const Icon(
-                                          EvaIcons.arrowIosDownward,
-                                          size: 25,
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 15, vertical: 15),
+                                    child: Align(
+                                      alignment:
+                                          AlignmentDirectional.bottomStart,
+                                      child: Container(
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              flex: 3,
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    currentModel.name,
+                                                    maxLines: 3,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                        color: myThemes
+                                                            .getFontAllWhite(
+                                                                context),
+                                                        fontSize: 25,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.pin_drop,
+                                                        size: 15,
+                                                        color: myThemes
+                                                            .getIconColor(
+                                                                context),
+                                                      ),
+                                                      Text(
+                                                        currentModel.address,
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: TextStyle(
+                                                          color: myThemes
+                                                              .getFontAllWhite(
+                                                                  context),
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Text(
+                                                    currentModel.type
+                                                        .toUpperCase(),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: myThemes
+                                                          .getFontAllWhite(
+                                                              context),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            const Spacer(
+                                              flex: 1,
+                                            ),
+                                            Expanded(
+                                              flex: 1,
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text(
+                                                        reviewAverage
+                                                            .toString(),
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: myThemes
+                                                              .getFontAllWhite(
+                                                                  context),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      Icon(
+                                                        EvaIcons.star,
+                                                        size: 15,
+                                                        color: myThemes
+                                                            .getIconColor(
+                                                                context),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  Text(
+                                                    "${reviewCount}  reviews",
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: myThemes
+                                                          .getFontAllWhite(
+                                                              context),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                )
-                              ],
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 15,
-                          ),
-                          Center(
-                            child: Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 25),
-                              child: Text(
-                                currentModel.descriptionHeader,
-                                overflow: !show ? TextOverflow.ellipsis : null,
-                                maxLines: !show ? 2 : null,
-                                style: TextStyle(
-                                  color:
-                                      myThemes.getFontwithOpacity(context, .6),
-                                  fontSize: 15,
-                                ),
+                                      ),
+                                    ),
+                                  )
+                                ],
                               ),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          if (show)
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 25),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    'About this Tourist Spot',
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        if (show == false) {
+                                          show = true;
+                                          return;
+                                        }
+                                        show = false;
+                                      });
+                                    },
+                                    icon: show
+                                        ? const Icon(
+                                            EvaIcons.arrowIosUpward,
+                                            size: 25,
+                                          )
+                                        : const Icon(
+                                            EvaIcons.arrowIosDownward,
+                                            size: 25,
+                                          ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 15,
+                            ),
                             Center(
                               child: Container(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 25),
                                 child: Text(
-                                  currentModel.description,
-                                  textAlign: TextAlign.justify,
+                                  currentModel.descriptionHeader,
+                                  overflow:
+                                      !show ? TextOverflow.ellipsis : null,
+                                  maxLines: !show ? 2 : null,
                                   style: TextStyle(
                                     color: myThemes.getFontwithOpacity(
                                         context, .6),
@@ -316,97 +314,875 @@ class _SpotPageState extends State<SpotPage> {
                                 ),
                               ),
                             ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          SizedBox(
-                            height: 175,
-                            width: MediaQuery.of(context).size.width,
-                            child: CarouselSlider.builder(
-                              itemCount: currentModel.images.length,
-                              itemBuilder: (context, index, realIndex) {
-                                final images = currentModel.images[index];
-                                return buildImage(images, index);
-                              },
-                              options: CarouselOptions(
-                                viewportFraction: 0.9,
-                                enableInfiniteScroll: true,
-                                autoPlay: true,
-                                autoPlayInterval: const Duration(seconds: 5),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            if (show)
+                              Center(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 25),
+                                  child: Text(
+                                    currentModel.description,
+                                    textAlign: TextAlign.justify,
+                                    style: TextStyle(
+                                      color: myThemes.getFontwithOpacity(
+                                          context, .6),
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            SizedBox(
+                              height: 175,
+                              width: MediaQuery.of(context).size.width,
+                              child: CarouselSlider.builder(
+                                itemCount: currentModel.images.length,
+                                itemBuilder: (context, index, realIndex) {
+                                  final images = currentModel.images[index];
+                                  return buildImage(images, index);
+                                },
+                                options: CarouselOptions(
+                                  viewportFraction: 0.9,
+                                  enableInfiniteScroll: true,
+                                  autoPlay: true,
+                                  autoPlayInterval: const Duration(seconds: 5),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 25),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Rate this Attraction',
-                                  style: TextStyle(fontSize: 20),
-                                ),
-                                const Text(
-                                  'Tell others what you think',
-                                  style: TextStyle(fontSize: 12),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Center(
-                                  child: RatingBar.builder(
-                                    itemSize: 35,
-                                    itemPadding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    minRating: 1,
-                                    itemBuilder: (context, _) => Icon(
-                                      EvaIcons.star,
-                                      color: myThemes.getIconColor(context),
-                                    ),
-                                    onRatingUpdate: (rating) {},
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 25),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Rate this Attraction',
+                                    style: TextStyle(fontSize: 20),
                                   ),
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                Center(
-                                  child: TextButton(
-                                    onPressed: () {},
-                                    child: Text(
-                                      'Write a comment',
-                                      style: TextStyle(
-                                          fontSize: 15,
+                                  const Text(
+                                    'Tell others what you think',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  if (!currentModel.review
+                                          .containsKey(user.email) ||
+                                      showRating)
+                                    Center(
+                                      child: RatingBar.builder(
+                                        initialRating: starRating.toDouble(),
+                                        itemSize: 35,
+                                        itemPadding: const EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        minRating: currentModel.review
+                                                .containsKey(user.email)
+                                            ? 1
+                                            : 0,
+                                        itemBuilder: (context, _) => Icon(
+                                          EvaIcons.star,
+                                          color: myThemes.getIconColor(context),
+                                        ),
+                                        updateOnDrag: true,
+                                        onRatingUpdate: (rating) {
+                                          setState(() {
+                                            starRating = rating.toInt();
+                                            updateStar = rating.toInt();
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  if (currentModel.review
+                                          .containsKey(user.email) &&
+                                      !showRating)
+                                    const Center(
+                                      child: Text(
+                                        "Your Rating",
+                                        style: TextStyle(
+                                          fontSize: 20,
                                           fontWeight: FontWeight.bold,
-                                          color:
-                                              myThemes.getIconColor(context)),
+                                        ),
+                                      ),
+                                    ),
+                                  if (starRating != 0)
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                  if (starRating != 0)
+                                    Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          if (!showRating)
+                                            Text(
+                                              starRating.toString(),
+                                              style: const TextStyle(
+                                                fontSize: 40,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          if (showRating)
+                                            Text(
+                                              updateStar.toString(),
+                                              style: const TextStyle(
+                                                fontSize: 40,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          const SizedBox(
+                                            width: 20,
+                                          ),
+                                          const Text(
+                                            "Stars",
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  if (starRating != 0 &&
+                                      !currentModel.review
+                                          .containsKey(user.email))
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 80),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(25),
+                                        child: Container(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          color: myThemes.getIconColor(context),
+                                          child: TextButton(
+                                            onPressed: () {
+                                              addRating(currentModel, user,
+                                                  starRating);
+                                            },
+                                            child: Text(
+                                              'Rate',
+                                              style: TextStyle(
+                                                  color: myThemes
+                                                      .getPrimaryColor(context),
+                                                  fontSize: 25,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  if (currentModel.review
+                                          .containsKey(user.email) &&
+                                      showRating)
+                                    Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 80),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            child: Container(
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              color: myThemes
+                                                  .getIconColor(context),
+                                              child: TextButton(
+                                                onPressed: () {
+                                                  updateRating(currentModel,
+                                                      user, updateStar);
+                                                  setState(() {
+                                                    showRating = false;
+                                                  });
+                                                },
+                                                child: Text(
+                                                  'Update',
+                                                  style: TextStyle(
+                                                      color: myThemes
+                                                          .getPrimaryColor(
+                                                              context),
+                                                      fontSize: 25,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 80),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            child: Container(
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              color: myThemes
+                                                  .getIconColor(context),
+                                              child: TextButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    showRating = false;
+                                                  });
+                                                },
+                                                child: Text(
+                                                  'Cancel',
+                                                  style: TextStyle(
+                                                      color: myThemes
+                                                          .getPrimaryColor(
+                                                              context),
+                                                      fontSize: 25,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  if (currentModel.review
+                                          .containsKey(user.email) &&
+                                      !showRating)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 80),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(25),
+                                        child: Container(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          color: myThemes.getIconColor(context),
+                                          child: TextButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                showRating = true;
+                                                updateStar = starRating;
+                                              });
+                                            },
+                                            child: Text(
+                                              'Edit Rating',
+                                              style: TextStyle(
+                                                  color: myThemes
+                                                      .getPrimaryColor(context),
+                                                  fontSize: 25,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Center(
+                                    child: TextButton(
+                                      onPressed: () {},
+                                      child: Text(
+                                        'Write a comment',
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color:
+                                                myThemes.getIconColor(context)),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                          const Center(
-                            child: Text(
-                              'Comment Section Here below',
-                              style: TextStyle(
-                                  fontSize: 25, fontWeight: FontWeight.bold),
+                            const Center(
+                              child: Text(
+                                'Comment Section Here below',
+                                style: TextStyle(
+                                    fontSize: 25, fontWeight: FontWeight.bold),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            );
+              );
+            } else {
+              return makeDismissable(
+                context: context,
+                child: DraggableScrollableSheet(
+                  initialChildSize: .7,
+                  maxChildSize: .9,
+                  minChildSize: .6,
+                  builder: (_, controller) => Scaffold(
+                    backgroundColor: Colors.transparent,
+                    floatingActionButton:
+                        buildNavigateButton(context, currentModel),
+                    body: Container(
+                      decoration: BoxDecoration(
+                        color: myThemes.getPrimaryColor(context),
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(20),
+                        ),
+                      ),
+                      child: SingleChildScrollView(
+                        controller: controller,
+                        child: Column(
+                          children: <Widget>[
+                            const Icon(
+                              Icons.drag_handle,
+                              size: 30,
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: myThemes.getPrimaryColor(context),
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(.2),
+                                    spreadRadius: .1,
+                                    blurRadius: .1,
+                                  )
+                                ],
+                              ),
+                              height: 250,
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  Image.network(
+                                    currentModel.imgUrl,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (BuildContext context,
+                                        Object exception,
+                                        StackTrace? stackTrace) {
+                                      return Center(
+                                          child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: const [
+                                          Icon(Icons.error_outline),
+                                          Text("Failed to load Images"),
+                                        ],
+                                      ));
+                                    },
+                                  ),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.transparent,
+                                          Colors.black.withOpacity(1),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 15, vertical: 15),
+                                    child: Align(
+                                      alignment:
+                                          AlignmentDirectional.bottomStart,
+                                      child: Container(
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              flex: 3,
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    currentModel.name,
+                                                    maxLines: 3,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                        color: myThemes
+                                                            .getFontAllWhite(
+                                                                context),
+                                                        fontSize: 25,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.pin_drop,
+                                                        size: 15,
+                                                        color: myThemes
+                                                            .getIconColor(
+                                                                context),
+                                                      ),
+                                                      Text(
+                                                        currentModel.address,
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: TextStyle(
+                                                          color: myThemes
+                                                              .getFontAllWhite(
+                                                                  context),
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Text(
+                                                    currentModel.type
+                                                        .toUpperCase(),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: myThemes
+                                                          .getFontAllWhite(
+                                                              context),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            const Spacer(
+                                              flex: 1,
+                                            ),
+                                            Expanded(
+                                              flex: 1,
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text(
+                                                        reviewAverage
+                                                            .toString(),
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: myThemes
+                                                              .getFontAllWhite(
+                                                                  context),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      Icon(
+                                                        EvaIcons.star,
+                                                        size: 15,
+                                                        color: myThemes
+                                                            .getIconColor(
+                                                                context),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  Text(
+                                                    "$reviewCount  reviews",
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: myThemes
+                                                          .getFontAllWhite(
+                                                              context),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 25),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    'About this Tourist Spot',
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        if (show == false) {
+                                          show = true;
+                                          return;
+                                        }
+                                        show = false;
+                                      });
+                                    },
+                                    icon: show
+                                        ? const Icon(
+                                            EvaIcons.arrowIosUpward,
+                                            size: 25,
+                                          )
+                                        : const Icon(
+                                            EvaIcons.arrowIosDownward,
+                                            size: 25,
+                                          ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 15,
+                            ),
+                            Center(
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 25),
+                                child: Text(
+                                  currentModel.descriptionHeader,
+                                  overflow:
+                                      !show ? TextOverflow.ellipsis : null,
+                                  maxLines: !show ? 2 : null,
+                                  style: TextStyle(
+                                    color: myThemes.getFontwithOpacity(
+                                        context, .6),
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            if (show)
+                              Center(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 25),
+                                  child: Text(
+                                    currentModel.description,
+                                    textAlign: TextAlign.justify,
+                                    style: TextStyle(
+                                      color: myThemes.getFontwithOpacity(
+                                          context, .6),
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            SizedBox(
+                              height: 175,
+                              width: MediaQuery.of(context).size.width,
+                              child: CarouselSlider.builder(
+                                itemCount: currentModel.images.length,
+                                itemBuilder: (context, index, realIndex) {
+                                  final images = currentModel.images[index];
+                                  return buildImage(images, index);
+                                },
+                                options: CarouselOptions(
+                                  viewportFraction: 0.9,
+                                  enableInfiniteScroll: true,
+                                  autoPlay: true,
+                                  autoPlayInterval: const Duration(seconds: 5),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 25),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Rate this Attraction',
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                  const Text(
+                                    'Tell others what you think',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Center(
+                                    child: RatingBar.builder(
+                                      initialRating: starRating.toDouble(),
+                                      itemSize: 35,
+                                      itemPadding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      minRating: 0,
+                                      itemBuilder: (context, _) => Icon(
+                                        EvaIcons.star,
+                                        color: myThemes.getIconColor(context),
+                                      ),
+                                      updateOnDrag: true,
+                                      onRatingUpdate: (rating) {
+                                        setState(() {
+                                          starRating = rating.toInt();
+                                          updateStar = rating.toInt();
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  if (starRating != 0)
+                                    Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          if (!showRating)
+                                            Text(
+                                              starRating.toString(),
+                                              style: const TextStyle(
+                                                fontSize: 40,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          if (showRating)
+                                            Text(
+                                              updateStar.toString(),
+                                              style: const TextStyle(
+                                                fontSize: 40,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          const SizedBox(
+                                            width: 20,
+                                          ),
+                                          const Text(
+                                            "Stars",
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  if (starRating != 0)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 80),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(25),
+                                        child: Container(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          color: myThemes.getIconColor(context),
+                                          child: TextButton(
+                                            onPressed: () {
+                                              showDialog(
+                                                  barrierDismissible: false,
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return StatefulBuilder(
+                                                        builder:
+                                                            (contex, setState) {
+                                                      return Dialog(
+                                                          backgroundColor:
+                                                              Colors
+                                                                  .transparent,
+                                                          child: Card(
+                                                            child: Container(
+                                                              padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                  horizontal:
+                                                                      30,
+                                                                  vertical: 30),
+                                                              child: Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .min,
+                                                                children: [
+                                                                  const Text(
+                                                                    "You need to log in first",
+                                                                    maxLines: 3,
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          30,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    height: 50,
+                                                                  ),
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceEvenly,
+                                                                    children: [
+                                                                      ClipRRect(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(15),
+                                                                        child:
+                                                                            Container(
+                                                                          color:
+                                                                              myThemes.getIconColor(context),
+                                                                          width:
+                                                                              100,
+                                                                          child:
+                                                                              TextButton(
+                                                                            child:
+                                                                                Text(
+                                                                              "Login",
+                                                                              style: TextStyle(color: myThemes.getPrimaryColor(context), fontSize: 25, fontWeight: FontWeight.bold),
+                                                                            ),
+                                                                            onPressed:
+                                                                                () {
+                                                                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => const AuthPage()));
+                                                                            },
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      ClipRRect(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(15),
+                                                                        child:
+                                                                            Container(
+                                                                          color:
+                                                                              myThemes.getIconColor(context),
+                                                                          width:
+                                                                              100,
+                                                                          child:
+                                                                              TextButton(
+                                                                            child:
+                                                                                Text(
+                                                                              "Cancel",
+                                                                              style: TextStyle(color: myThemes.getPrimaryColor(context), fontSize: 25, fontWeight: FontWeight.bold),
+                                                                            ),
+                                                                            onPressed:
+                                                                                () {
+                                                                              Navigator.of(context).pop();
+                                                                            },
+                                                                          ),
+                                                                        ),
+                                                                      )
+                                                                    ],
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ));
+                                                    });
+                                                  });
+                                            },
+                                            child: Text(
+                                              'Rate',
+                                              style: TextStyle(
+                                                  color: myThemes
+                                                      .getPrimaryColor(context),
+                                                  fontSize: 25,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Center(
+                                    child: TextButton(
+                                      onPressed: () {},
+                                      child: Text(
+                                        'Write a comment',
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color:
+                                                myThemes.getIconColor(context)),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Center(
+                              child: Text(
+                                'Comment Section Here below',
+                                style: TextStyle(
+                                    fontSize: 25, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }
           } else {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
         });
+  }
+
+  addRating(SpotModel currentModel, User? user, value) {
+    FirebaseFirestore.instance.collection('Spots').doc(currentModel.name).set({
+      'review': {
+        user!.email: value.toString(),
+      }
+    }, SetOptions(merge: true));
+  }
+
+  updateRating(SpotModel currentModel, User? user, value) {
+    FirebaseFirestore.instance
+        .collection('Spots')
+        .doc(currentModel.name)
+        .update({
+      'review': {
+        user!.email: value.toString(),
+      }
+    });
   }
 
   Stream<SpotModel> readSpots() {
