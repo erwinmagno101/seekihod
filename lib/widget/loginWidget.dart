@@ -166,51 +166,26 @@ class _LoginWidgetState extends State<LoginWidget> {
                     const SizedBox(
                       height: 15,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30),
-                              border: Border.all(
-                                  color: myThemes.getIconColor(context),
-                                  width: 2)),
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {},
-                            icon: const Icon(
-                              EvaIcons.facebook,
-                              color: Colors.blue,
-                              size: 30,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
-                              border: Border.all(
-                                  color: myThemes.getIconColor(context),
-                                  width: 2)),
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              final provider =
-                                  Provider.of<GoogleSignInProvider>(context,
-                                      listen: false);
+                    Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          border: Border.all(
+                              color: myThemes.getIconColor(context), width: 2)),
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          final provider = Provider.of<GoogleSignInProvider>(
+                              context,
+                              listen: false);
 
-                              provider.googleLogin();
-                            },
-                            icon: const Icon(
-                              EvaIcons.google,
-                              color: Colors.green,
-                              size: 30,
-                            ),
-                          ),
+                          provider.googleLogin();
+                        },
+                        icon: const Icon(
+                          EvaIcons.google,
+                          color: Colors.green,
+                          size: 30,
                         ),
-                      ],
+                      ),
                     ),
                     const SizedBox(
                       height: 15,
