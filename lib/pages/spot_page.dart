@@ -1670,6 +1670,14 @@ Widget buildNavigateButton(BuildContext context, SpotModel spotModel) =>
         style: TextStyle(color: myThemes.getFontAllWhite(context)),
       ),
       onPressed: () {
+        FirebaseFirestore.instance
+            .collection('Spots')
+            .doc(spotModel.name)
+            .update(
+          {
+            "engagement": (int.parse(spotModel.engagement) + 1).toString(),
+          },
+        );
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => MapScreen(spotModel: spotModel)));
       },
