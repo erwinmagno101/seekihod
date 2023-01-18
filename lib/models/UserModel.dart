@@ -6,11 +6,13 @@ class UserModel {
   String displayName;
   String userName;
   String imgUrl;
+  String type;
 
   UserModel({
     required this.displayName,
     required this.userName,
     required this.imgUrl,
+    required this.type,
   });
 
   Map<String, dynamic> toJson() =>
@@ -20,5 +22,6 @@ class UserModel {
         displayName: json['displayName'],
         userName: json['userName'],
         imgUrl: json['imgUrl'],
+        type: json['type'],
       );
 }

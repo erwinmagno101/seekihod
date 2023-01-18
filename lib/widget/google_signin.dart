@@ -29,6 +29,7 @@ class GoogleSignInProvider extends ChangeNotifier {
           email: googleUser.email,
           displayName: googleUser.displayName.toString(),
           userName: "",
+          type: "user",
           imgUrl: googleUser.photoUrl.toString());
     }
 
@@ -61,6 +62,7 @@ class GoogleSignInProvider extends ChangeNotifier {
     required String displayName,
     required String userName,
     required String imgUrl,
+    required String type,
   }) async {
     final docUser = FirebaseFirestore.instance.collection('User').doc(email);
 
@@ -69,6 +71,7 @@ class GoogleSignInProvider extends ChangeNotifier {
       'displayName': displayName,
       'userName': userName,
       'imgUrl': imgUrl,
+      'type': type,
     };
 
     await docUser.set(json);

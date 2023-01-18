@@ -37,6 +37,8 @@ class _SignUpWidgetState extends State<SignUpWidget> {
   final displayNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final userNameController = TextEditingController();
+  String typeDropDownValue = 'user';
+
   String photoUrlDownload = "";
   String _password = "";
   String _message = "";
@@ -317,6 +319,56 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                 ),
               ),
               const SizedBox(
+                height: 10,
+              ),
+              const Center(
+                child: Text(
+                  "User Type",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                      color: myThemes.getSecondaryColor(context),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(20))),
+                  child: DropdownButton<String>(
+                    value: typeDropDownValue,
+                    alignment: AlignmentDirectional.center,
+                    icon: const Icon(EvaIcons.arrowIosDownward),
+                    iconSize: 15,
+                    elevation: 5,
+                    dropdownColor: myThemes.getSecondaryColor(context),
+                    focusColor: Colors.red,
+                    style: const TextStyle(
+                      color: Colors.white60,
+                    ),
+                    underline: Container(
+                      color: Colors.transparent,
+                    ),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        typeDropDownValue = newValue!;
+                      });
+                    },
+                    items: <String>[
+                      'user',
+                      'tour guide',
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+              const SizedBox(
                 height: 30,
               ),
               Padding(
@@ -406,6 +458,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
       final email = emailController.text;
       final displayName = displayNameController.text;
       final userName = userNameController.text;
+      final type = typeDropDownValue;
       await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
         email: emailController.text.trim(),
@@ -420,11 +473,12 @@ class _SignUpWidgetState extends State<SignUpWidget> {
       });
 
       createUser(
-              email: email,
-              displayName: displayName,
-              userName: userName,
-              imgUrl: "")
-          .then((value) {
+        email: email,
+        displayName: displayName,
+        userName: userName,
+        imgUrl: "",
+        type: type,
+      ).then((value) {
         navigatorKey.currentState!.pop();
         navigatorKey.currentState!.popUntil((route) => route.isCurrent);
       });
@@ -448,6 +502,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
     required String displayName,
     required String userName,
     required String imgUrl,
+    required String type,
   }) async {
     final docUser = FirebaseFirestore.instance.collection('User').doc(email);
 
@@ -456,6 +511,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
       'displayName': displayName,
       'userName': userName,
       'imgUrl': imgUrl,
+      'type': type,
     };
 
     await docUser.set(json);

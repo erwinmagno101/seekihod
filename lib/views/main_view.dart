@@ -7,6 +7,7 @@ import 'package:seekihod/pages/Auth_page.dart';
 import 'package:seekihod/views/archive_view.dart';
 import 'package:seekihod/views/events_view.dart';
 import 'package:seekihod/views/feature_view.dart';
+import 'package:seekihod/views/guide_view.dart';
 import 'package:seekihod/views/home_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -30,6 +31,7 @@ class _MainViewState extends State<MainView> {
     const FeatureView(),
     const EventsView(),
     const DirectoryView(),
+    const GuideView(),
   ];
 
   final title = [
@@ -37,6 +39,7 @@ class _MainViewState extends State<MainView> {
     const Text('Featured'),
     const Text('Events'),
     const Text('Archive'),
+    const Text('Tour Guide Panel'),
   ];
 
   Widget avatar(double rad, User user) {
@@ -155,97 +158,134 @@ class _MainViewState extends State<MainView> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
-      child: Scaffold(
-        drawer: NavigationDrawer(),
-        appBar: AppBar(
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 15),
-              child: InkWell(
-                overlayColor:
-                    MaterialStateProperty.all(const Color(0x00000000)),
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const AuthPage()));
-                },
-                child: StreamBuilder<User?>(
-                  stream: FirebaseAuth.instance.authStateChanges(),
-                  builder: (context, snapshot) {
-                    final user = FirebaseAuth.instance.currentUser;
-                    if (snapshot.hasData) {
-                      return CircleAvatar(
-                        radius: 15,
-                        backgroundImage:
-                            NetworkImage(user!.photoURL.toString()),
-                      );
-                    } else {
-                      return const CircleAvatar(
-                        radius: 15,
-                        backgroundImage:
-                            AssetImage('lib/assets/images/emptyProfile.jpg'),
-                      );
-                    }
-                  },
-                ),
+      child: FutureBuilder<UserModel?>(
+          future: readUser(),
+          builder: (context, snapshot) {
+            bool isTourGuide = false;
+            if (snapshot.hasData) {
+              if (snapshot.data!.type == "tour guide") {
+                isTourGuide = true;
+              } else {
+                isTourGuide = false;
+              }
+            }
+            return Scaffold(
+              drawer: NavigationDrawer(),
+              appBar: AppBar(
+                actions: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 15),
+                    child: InkWell(
+                      overlayColor:
+                          MaterialStateProperty.all(const Color(0x00000000)),
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const AuthPage()));
+                      },
+                      child: StreamBuilder<User?>(
+                        stream: FirebaseAuth.instance.authStateChanges(),
+                        builder: (context, snapshot) {
+                          final user = FirebaseAuth.instance.currentUser;
+                          if (snapshot.hasData) {
+                            return CircleAvatar(
+                              radius: 15,
+                              backgroundImage:
+                                  NetworkImage(user!.photoURL.toString()),
+                            );
+                          } else {
+                            return const CircleAvatar(
+                              radius: 15,
+                              backgroundImage: AssetImage(
+                                  'lib/assets/images/emptyProfile.jpg'),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  )
+                ],
+                iconTheme: IconThemeData(color: myThemes.getIconColor(context)),
+                centerTitle: true,
+                elevation: 0,
+                title: title[index],
               ),
-            )
-          ],
-          iconTheme: IconThemeData(color: myThemes.getIconColor(context)),
-          centerTitle: true,
-          elevation: 0,
-          title: title[index],
-        ),
-        body: screens[index],
-        bottomNavigationBar: NavigationBar(
-          onDestinationSelected: (index) => setState(() => this.index = index),
-          selectedIndex: index,
-          height: 50,
-          labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-          destinations: [
-            NavigationDestination(
-              icon: const Icon(
-                EvaIcons.homeOutline,
+              body: screens[index],
+              bottomNavigationBar: NavigationBar(
+                onDestinationSelected: (index) =>
+                    setState(() => this.index = index),
+                selectedIndex: index,
+                height: 50,
+                labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+                destinations: [
+                  NavigationDestination(
+                    icon: const Icon(
+                      EvaIcons.homeOutline,
+                    ),
+                    selectedIcon: Icon(
+                      EvaIcons.home,
+                      color: myThemes.getIconColor(context),
+                    ),
+                    label: 'Home',
+                  ),
+                  NavigationDestination(
+                    icon: const Icon(
+                      EvaIcons.starOutline,
+                    ),
+                    selectedIcon: Icon(
+                      EvaIcons.star,
+                      color: myThemes.getIconColor(context),
+                    ),
+                    label: 'Featured',
+                  ),
+                  NavigationDestination(
+                    icon: const Icon(
+                      EvaIcons.calendarOutline,
+                    ),
+                    selectedIcon: Icon(
+                      EvaIcons.calendar,
+                      color: myThemes.getIconColor(context),
+                    ),
+                    label: 'Events',
+                  ),
+                  NavigationDestination(
+                    icon: const Icon(
+                      EvaIcons.bookOpenOutline,
+                    ),
+                    selectedIcon: Icon(
+                      EvaIcons.bookOpen,
+                      color: myThemes.getIconColor(context),
+                    ),
+                    label: 'Archive',
+                  ),
+                  if (FirebaseAuth.instance.currentUser != null && isTourGuide)
+                    NavigationDestination(
+                      icon: const Icon(
+                        EvaIcons.optionsOutline,
+                      ),
+                      selectedIcon: Icon(
+                        EvaIcons.options,
+                        color: myThemes.getIconColor(context),
+                      ),
+                      label: 'Tourist Guide Panel',
+                    ),
+                ],
               ),
-              selectedIcon: Icon(
-                EvaIcons.home,
-                color: myThemes.getIconColor(context),
-              ),
-              label: 'Home',
-            ),
-            NavigationDestination(
-              icon: const Icon(
-                EvaIcons.starOutline,
-              ),
-              selectedIcon: Icon(
-                EvaIcons.star,
-                color: myThemes.getIconColor(context),
-              ),
-              label: 'Featured',
-            ),
-            NavigationDestination(
-              icon: const Icon(
-                EvaIcons.calendarOutline,
-              ),
-              selectedIcon: Icon(
-                EvaIcons.calendar,
-                color: myThemes.getIconColor(context),
-              ),
-              label: 'Events',
-            ),
-            NavigationDestination(
-              icon: const Icon(
-                EvaIcons.bookOpenOutline,
-              ),
-              selectedIcon: Icon(
-                EvaIcons.bookOpen,
-                color: myThemes.getIconColor(context),
-              ),
-              label: 'Archive',
-            ),
-          ],
-        ),
-      ),
+            );
+          }),
     );
+  }
+
+  Future<UserModel?> readUser() async {
+    final docUser = FirebaseFirestore.instance
+        .collection('User')
+        .doc(FirebaseAuth.instance.currentUser!.email.toString());
+
+    final snapshot = await docUser.get();
+
+    if (snapshot.exists) {
+      return UserModel.fromJson(snapshot.data()!);
+    }
+    return null;
   }
 }
 
@@ -385,6 +425,23 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
               title: Text('DOT Siquijor'),
             ),
             ListTile(
+              leading: const Icon(EvaIcons.browser),
+              title: const Text('DOT Siquijor Website'),
+              onTap: () async {
+                final url = Uri.parse("https://siquijorprovince.com/");
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(
+                    url,
+                    webViewConfiguration:
+                        const WebViewConfiguration(enableJavaScript: true),
+                    mode: LaunchMode.externalApplication,
+                  );
+                } else {
+                  throw 'Could not launch $url';
+                }
+              },
+            ),
+            ListTile(
               leading: const Icon(EvaIcons.heart),
               title: const Text('Health Protocols'),
               onTap: () async {
@@ -402,17 +459,22 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                 }
               },
             ),
-            const ListTile(
-              leading: Icon(EvaIcons.questionMarkCircle),
-              title: Text('FAQs'),
-            ),
-            const ListTile(
-              leading: Icon(EvaIcons.phoneCall),
-              title: Text('Hotline'),
-            ),
-            const ListTile(
-              leading: Icon(EvaIcons.facebook),
-              title: Text('Facebook'),
+            ListTile(
+              leading: const Icon(EvaIcons.facebook),
+              title: const Text('Facebook Page'),
+              onTap: () async {
+                final url = Uri.parse("https://web.facebook.com/Isla.de.Fuego");
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(
+                    url,
+                    webViewConfiguration:
+                        const WebViewConfiguration(enableJavaScript: true),
+                    mode: LaunchMode.externalApplication,
+                  );
+                } else {
+                  throw 'Could not launch $url';
+                }
+              },
             ),
             Divider(
               color: myThemes.getIconColor(context),

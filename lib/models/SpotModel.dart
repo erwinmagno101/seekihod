@@ -9,6 +9,7 @@ class SpotModel {
   String address;
   String type;
   GeoPoint geoPoint;
+  String engagement;
   var images = [];
   var comment = {};
   var review = {};
@@ -24,6 +25,7 @@ class SpotModel {
     required this.geoPoint,
     required this.comment,
     required this.review,
+    required this.engagement,
   });
 
   Map<String, dynamic> toJson() => {
@@ -37,6 +39,7 @@ class SpotModel {
         'geopoint': geoPoint,
         'comment': comment,
         'review': review,
+        'engagement': engagement,
       };
 
   static SpotModel fromJson(Map<String, dynamic> json) => SpotModel(
@@ -50,5 +53,6 @@ class SpotModel {
         geoPoint: json['geopoint'],
         review: json['review'],
         comment: json['comment'],
+        engagement: json['engagement'],
       );
 }

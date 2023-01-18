@@ -27,7 +27,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
   bool canResendEmail = false;
   MyThemes myThemes = MyThemes();
   Timer? _timer;
-  int _start = 30;
+  int _start = 120;
 
   void startTimer() {
     const oneSec = Duration(seconds: 1);
@@ -76,11 +76,11 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
 
       setState(() {
         canResendEmail = false;
-        _start = 30;
+        _start = 120;
       });
 
       startTimer();
-      await Future.delayed(const Duration(seconds: 30));
+      await Future.delayed(const Duration(seconds: 120));
 
       setState(() => canResendEmail = true);
     } catch (e) {
