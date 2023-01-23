@@ -532,7 +532,7 @@ class _SpotPageState extends State<SpotPage> {
                                                     .getIconColor(context),
                                                 child: TextButton(
                                                   onPressed: () {
-                                                    updateRating(currentModel,
+                                                    addRating(currentModel,
                                                         user, updateStar);
                                                     Fluttertoast.showToast(
                                                       backgroundColor:
@@ -1573,17 +1573,6 @@ class _SpotPageState extends State<SpotPage> {
         user!.email: value.toString(),
       }
     }, SetOptions(merge: true));
-  }
-
-  updateRating(SpotModel currentModel, User? user, value) {
-    FirebaseFirestore.instance
-        .collection('Spots')
-        .doc(currentModel.name)
-        .update({
-      'review': {
-        user!.email: value.toString(),
-      }
-    });
   }
 
   Stream<SpotModel> readSpots() {
