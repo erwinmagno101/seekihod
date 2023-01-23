@@ -1560,11 +1560,14 @@ class _SpotPageState extends State<SpotPage> {
   }
 
   addRating(SpotModel currentModel, User? user, value) {
-    FirebaseFirestore.instance.collection('Spots').doc(currentModel.name).set({
-      'review': {
-        user!.email: value.toString(),
-      }
-    }, SetOptions(merge: true));
+    FirebaseFirestore.instance.collection('Spots').doc(currentModel.name).set(
+      {
+        'review': {
+          user!.email: value.toString(),
+        }
+      },
+      SetOptions(merge: true),
+    );
   }
 
   addComment(SpotModel currentModel, User? user, value) {
